@@ -5,39 +5,8 @@ import { EvModule, EvModuleType } from "../gpm-lib/EvFile";
 import { read_short } from "../gpm-lib/helpers";
 import { decompress_texture } from "../gpm-lib/texture";
 import { EventPreview } from "./EventPreview";
+import { EvTexturePreview } from "./EVTexturePreview";
 import { TexturePreview, TextureType } from "./TexturePreview";
-
-function coloredClutFromRaw(data: Uint8Array): Uint16Array {
-  if (data.length !== 512) throw new Error("Unexpected data length");
-
-  const output = [];
-
-  for (let i = 0; i < 256; i++) {
-    output.push(read_short(data, i * 2));
-  }
-
-  return new Uint16Array(output);
-}
-
-export const EvModuleView = ({ module }: { module: EvModule }) => {
-  const clut = coloredClutFromRaw(module.data.slice(0 + 4, 512 + 4));
-  const evTexture = decompress_texture(module.data.slice(0x212 + 4), 0); // evdatafile.data, 0x5fd218);
-
-  return (
-    <div>
-      <span>Type: {module.friendlyType}</span>
-      <br />
-      {module.type === EvModuleType.Texture && (
-        <TexturePreview
-          texture={evTexture}
-          type={TextureType.EightBitClut}
-          clut={clut}
-        />
-      )}
-      {module.type === EvModuleType.Event && <EventPreview module={module} />}
-    </div>
-  );
-};
 
 export const EVDataEvents = observer(() => {
   const { fileStore } = useGPMToolContext();
@@ -66,7 +35,13 @@ export const EVDataEvents = observer(() => {
         value={currentOffset}
         onChange={(e) => setCurrentOffset(parseInt(e.currentTarget.value))}
       />
-      {module && <EvModuleView module={module} />}
+      {module && module.type == EvModuleType.Texture && (
+        <EvTexturePreview moduleId={currentOffset} />
+      )}
+      {module && module.type == EvModuleType.Event && (
+        <EventPreview module={module} />
+      )}
+
       {!module && <span>Empty module</span>}
     </div>
   );

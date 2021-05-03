@@ -1,12 +1,13 @@
 import { cmd_to_string } from "../gpm-lib/evdata";
 import { BaseCommand } from "../gpm-lib/Events/BaseCommand";
+import { TalkCommand } from "../gpm-lib/Events/Commands/TalkCommand";
 import { UnknownCommand } from "../gpm-lib/Events/Commands/UnknownCommand";
 import { EvString } from "../gpm-lib/Events/EvString";
 import { GPEvent } from "../gpm-lib/Events/GPEvent";
 import { EvModule } from "../gpm-lib/EvFile";
-import { read_short } from "../gpm-lib/helpers";
 
 import styles from "./EventPreview.module.css";
+import { EvTexturePreview } from "./EVTexturePreview";
 
 const shiftjis = require("shiftjis");
 
@@ -15,6 +16,8 @@ const elementFromCommand = (command: BaseCommand) => {
     return <StringEntry evString={command} />;
   } else if (command instanceof UnknownCommand) {
     return <UnknownCommandEntry unknownCommand={command} />;
+  } else if (command instanceof TalkCommand) {
+    return <TalkCommandEntry talkCommand={command} />;
   } else {
     return <div>Unknown command type</div>;
   }
@@ -24,6 +27,15 @@ const StringEntry = ({ evString }: { evString: EvString }) => {
   return (
     <div>
       {evString.offset} - {evString.text}
+    </div>
+  );
+};
+
+const TalkCommandEntry = ({ talkCommand }: { talkCommand: TalkCommand }) => {
+  return (
+    <div>
+      {talkCommand.offset} - Talk()
+      <EvTexturePreview moduleId={talkCommand.getTextureId()} />
     </div>
   );
 };
