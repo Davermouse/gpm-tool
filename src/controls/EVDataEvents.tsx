@@ -27,7 +27,6 @@ export const EvModuleView = ({ module }: { module: EvModule }) => {
     <div>
       <span>Type: {module.friendlyType}</span>
       <br />
-      <span>Unk2: {module.unk2}</span>
       {module.type === EvModuleType.Texture && (
         <TexturePreview
           texture={evTexture}

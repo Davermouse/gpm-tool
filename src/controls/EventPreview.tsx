@@ -1,66 +1,71 @@
 import { cmd_to_string } from "../gpm-lib/evdata";
+import { BaseCommand } from "../gpm-lib/Events/BaseCommand";
+import { UnknownCommand } from "../gpm-lib/Events/Commands/UnknownCommand";
+import { EvString } from "../gpm-lib/Events/EvString";
+import { GPEvent } from "../gpm-lib/Events/GPEvent";
 import { EvModule } from "../gpm-lib/EvFile";
 import { read_short } from "../gpm-lib/helpers";
 
+import styles from "./EventPreview.module.css";
+
 const shiftjis = require("shiftjis");
 
+const elementFromCommand = (command: BaseCommand) => {
+  if (command instanceof EvString) {
+    return <StringEntry evString={command} />;
+  } else if (command instanceof UnknownCommand) {
+    return <UnknownCommandEntry unknownCommand={command} />;
+  } else {
+    return <div>Unknown command type</div>;
+  }
+};
+
+const StringEntry = ({ evString }: { evString: EvString }) => {
+  return (
+    <div>
+      {evString.offset} - {evString.text}
+    </div>
+  );
+};
+
+const UnknownCommandEntry = ({
+  unknownCommand,
+}: {
+  unknownCommand: UnknownCommand;
+}) => {
+  const cmdData = cmd_to_string(unknownCommand.cmd);
+
+  return (
+    <div>
+      {unknownCommand.offset} - {cmdData.title}(
+      {unknownCommand.params.map((p) => `0x${p.toString(16)}`).join(",")})
+    </div>
+  );
+};
+
 export const EventPreview = ({ module }: { module: EvModule }) => {
-  let num_labels = read_short(module.data, 0);
-
-  let curr = num_labels - 2;
-
-  if (num_labels % 2 === 1) {
-    throw new Error("Unexpected labels length");
-  }
-
-  const entries = [];
-
-  while (true) {
-    if (module.data[curr] === 0x1b) {
-      // This is a command
-      const cmd = module.data[curr + 1];
-      const cmdData = cmd_to_string(cmd);
-
-      entries.push(
-        <span>
-          {cmd.toString(16)} ({cmd})- {cmdData.title}(
-          {new Array(cmdData.params)
-            .fill(0)
-            .map(
-              (_, i) =>
-                "0x" + read_short(module.data, curr + 2 + i * 2).toString(16)
-            )
-            .join(",")}
-          )<br />
-        </span>
-      );
-
-      curr += 2 + 2 * cmdData.params;
-    } else {
-      const stringBytes = [];
-      while (module.data[curr] !== 0) {
-        stringBytes.push(module.data[curr++]);
-      }
-
-      entries.push(
-        <>
-          {shiftjis.decode(stringBytes)}
-          <br />
-        </>
-      );
-      curr++;
-    }
-
-    if (entries.length > 100) {
-      break;
-    }
-  }
+  const event = new GPEvent(module.data);
 
   return (
     <div>
       <h2>Event preview</h2>
-      <span>Num labels: {num_labels}</span>
-      <div>{entries}</div>
+      <div>
+        <table>
+          <thead>
+            <th>Label</th>
+            <th>Destination</th>
+          </thead>
+          <tbody>
+            {event.labels.map((l) => (
+              <tr>
+                <td>{l.label.toString(16)}</td>
+                <td>{l.dest}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div>{event.commands.map((c) => elementFromCommand(c))}</div>
     </div>
   );
 };

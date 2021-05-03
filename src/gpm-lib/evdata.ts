@@ -6,7 +6,7 @@ const KaitaiStream = require("kaitai-struct/KaitaiStream");
 
 //const parsedEVData = new Evdatabin(new KaitaiStream(fileContent));
 
-export function cmd_to_string(cmd: number): { title: string; params: number } {
+export function cmd_to_string(cmd: number): { title: string; params?: number } {
   switch (cmd) {
     case 0:
       return {
@@ -43,6 +43,14 @@ export function cmd_to_string(cmd: number): { title: string; params: number } {
         title: "pause",
         params: 0,
       };
+    case 0x07:
+      return {
+        title: "faceload",
+      };
+    case 0x0a:
+      return {
+        title: "facefree",
+      };
     case 0x0d:
       return {
         title: "pgclose",
@@ -57,6 +65,21 @@ export function cmd_to_string(cmd: number): { title: string; params: number } {
       return {
         title: "voice",
         params: 1,
+      };
+    case 0x11:
+      return {
+        title: "addtime",
+        params: 1,
+      };
+    case 0x12:
+      return {
+        title: "add_friend",
+        params: 3,
+      };
+    case 0x13:
+      return {
+        title: "add_love",
+        params: 3,
       };
     case 0x14:
       return {
@@ -83,6 +106,11 @@ export function cmd_to_string(cmd: number): { title: string; params: number } {
         title: "stance",
         params: 3,
       };
+    case 0x19:
+      return {
+        title: "feeling",
+        params: 3,
+      };
     case 26:
       return {
         title: "faceon",
@@ -92,6 +120,25 @@ export function cmd_to_string(cmd: number): { title: string; params: number } {
       return {
         title: "faceoff",
         params: 2,
+      };
+    case 0x1c:
+      return {
+        title: "scenset",
+      };
+    case 0x1e:
+      return {
+        title: "rise",
+        params: 0,
+      };
+    case 0x1f:
+      return {
+        title: "charfree",
+        params: 1,
+      };
+    case 0x20:
+      return {
+        title: "charon",
+        params: 4,
       };
     case 0x22:
       return {
@@ -103,20 +150,46 @@ export function cmd_to_string(cmd: number): { title: string; params: number } {
         title: "fadeout",
         params: 0,
       };
+    case 0x26:
+      return {
+        title: "add_param",
+      };
     case 0x28:
       return {
         title: "thrust",
         params: 0,
+      };
+    case 0x29:
+      return {
+        title: "strname",
       };
     case 0x2a:
       return {
         title: "bgon",
         params: 0,
       };
+    case 0x2b:
+      return {
+        title: "bgoff",
+        params: 0,
+      };
     case 0x2d:
       return {
         title: "flagon",
         params: 1,
+      };
+    case 0x2e:
+      return {
+        title: "flagoff",
+        params: 1,
+      };
+    case 0x30:
+      return {
+        title: "mojiopen",
+      };
+    case 0x31:
+      return {
+        title: "mojiclose",
       };
     case 44:
       return {
@@ -128,29 +201,124 @@ export function cmd_to_string(cmd: number): { title: string; params: number } {
         title: "mapchange",
         params: 3,
       };
+    case 0x36:
+      return {
+        title: "ifchar",
+        params: 4,
+      };
     case 0x37:
       return {
         title: "strcolor",
         params: 2,
+      };
+    case 0x39:
+      return {
+        title: "keywait",
+        params: 1,
+      };
+    case 0x3a:
+      return {
+        title: "strspeed",
+      };
+    case 0x3b:
+      return {
+        title: "ifdeath",
+        params: 3,
+      };
+    case 0x3c:
+      return {
+        title: "ifflag",
+        params: 3,
+      };
+    case 0x3d:
+      return {
+        title: "title",
       };
     case 0x3e:
       return {
         title: "getitem",
         params: 3,
       };
+    case 0x45:
+      return {
+        title: "ifsex",
+        params: 4,
+      };
+    case 0x48:
+      return {
+        title: "addparamall",
+      };
+    case 0x4e:
+      return {
+        title: "addlifeall100",
+      };
+    case 0x4f:
+      return {
+        title: "se",
+        params: 1,
+      };
     case 0x55:
       return {
         title: "charwarp",
         params: 2,
+      };
+    case 0x58:
+      return {
+        title: "mojiopenfade",
+        params: 3,
+      };
+    case 0x59:
+      return {
+        title: "mojiclosefade",
+        params: 1,
+      };
+    case 0x5d:
+      return {
+        title: "ifcharmap",
+      };
+    case 0x62:
+      return {
+        title: "mapclean",
+      };
+    case 0x64:
+      return {
+        title: "ifjob",
+        params: 4,
       };
     case 102:
       return {
         title: "strsuper",
         params: 2,
       };
+    case 0x6b:
+      return {
+        title: "switchtype",
+      };
+    case 0x6d:
+      return {
+        title: "ifentry",
+      };
     case 0x74:
       return {
         title: "super",
+        params: 1,
+      };
+    case 0x75:
+      return {
+        title: "feelingall",
+      };
+    case 0x76:
+      return {
+        title: "addlifeenv",
+      };
+    case 0x7a:
+      return {
+        title: "strname2",
+        params: 3,
+      };
+    case 0x7f:
+      return {
+        title: "chengen",
         params: 1,
       };
     case 0x81:
@@ -173,6 +341,14 @@ export function cmd_to_string(cmd: number): { title: string; params: number } {
         title: "punishment",
         params: 1,
       };
+    case 0x86:
+      return {
+        title: "faceopenslow",
+      };
+    case 0x87:
+      return {
+        title: "facecloseslow",
+      };
     case 0x8a:
       return {
         title: "ifvsr",
@@ -193,6 +369,10 @@ export function cmd_to_string(cmd: number): { title: string; params: number } {
         title: "facecloseall",
         params: 0,
       };
+    case 0x8f:
+      return {
+        title: "ifclass",
+      };
     case 0x90:
       return {
         title: "ifgroup",
@@ -203,20 +383,66 @@ export function cmd_to_string(cmd: number): { title: string; params: number } {
         title: "selectex",
         params: 8,
       };
+    case 0x98:
+      return {
+        title: "whiteon",
+      };
+    case 0x99:
+      return {
+        title: "whitefree",
+      };
     case 0x9c:
       return {
         title: "battle",
         params: 1,
+      };
+    case 0x9d:
+      return {
+        title: "set_time",
+        params: 4,
       };
     case 0xa0:
       return {
         title: "shadepg",
         params: 3,
       };
+    case 0xa5:
+      return {
+        title: "charasibari",
+        params: 2,
+      };
     case 0xa6:
       return {
         title: "idokinsi",
         params: 2,
+      };
+    /*case 0xab:
+      return {
+        title: "charset",
+        params: 1,
+      };*/
+    case 0xad:
+      return {
+        title: "feelingreset",
+        params: 3,
+      };
+    case 0xb4:
+      return {
+        title: "trgturn",
+        params: 1,
+      };
+    case 0xb9:
+      return {
+        title: "ending",
+      };
+    case 0xc0:
+      return {
+        title: "equiphpocket",
+      };
+    case 0xc1:
+      return {
+        title: "setevmapexid",
+        params: 7,
       };
     case 0xc7:
       return {
@@ -228,10 +454,29 @@ export function cmd_to_string(cmd: number): { title: string; params: number } {
         title: "bgmstop",
         params: 0,
       };
+    case 0xcd:
+      return {
+        title: "endofturn",
+        params: 0,
+      };
     case 0xcf:
       return {
         title: "gosub",
         params: 1,
+      };
+    case 0xd0:
+      return {
+        title: "return",
+        params: 0,
+      };
+    case 0xd1:
+      return {
+        title: "comeon",
+        params: 2,
+      };
+    case 0xd4:
+      return {
+        title: "pausew",
       };
     case 214:
       return {
@@ -242,6 +487,20 @@ export function cmd_to_string(cmd: number): { title: string; params: number } {
       return {
         title: "charpos",
         params: 5,
+      };
+    case 0xdd:
+      return {
+        title: "pausew",
+      };
+    case 0xe2:
+      return {
+        title: "charrun",
+        params: 5,
+      };
+    case 0xeb:
+      return {
+        title: "charset",
+        params: 1,
       };
     case 0xde:
       return {
@@ -257,6 +516,16 @@ export function cmd_to_string(cmd: number): { title: string; params: number } {
       return {
         title: "charsync",
         params: 1,
+      };
+    case 0xe1:
+      return {
+        title: "charrot",
+        params: 2,
+      };
+    case 0xe3:
+      return {
+        title: "noresumes",
+        params: 0,
       };
     case 0xe4:
       return {
@@ -280,12 +549,9 @@ export function cmd_to_string(cmd: number): { title: string; params: number } {
       };
     default:
       return {
-        title: "unknown",
+        title: `unknown (${cmd.toString(16)} - ${cmd})`,
         params: 0,
       };
-      throw new Error(
-        `Unknown code: ${cmd.toString()} = 0x${cmd.toString(16)}`
-      );
   }
 }
 /*
@@ -298,26 +564,7 @@ const str = shiftjis.decode(simpleConv.data.content);
 const data = simpleConv.data.content;
 const VAR_PREFIX = 24;
 */
-function take_cmd(data: Uint8Array, idx: number) {
-  //  const label = data[idx];
-  const cmd = data[idx];
 
-  idx++;
-
-  const cmdData = cmd_to_string(cmd);
-
-  let desc = `${idx} ${cmdData.title}`;
-
-  for (let p = 0; p < cmdData.params; p++) {
-    desc += ` ${read_short(data, idx)}`;
-
-    idx += 2;
-  }
-
-  console.log(desc);
-
-  return idx;
-}
 /*
 
 const first_cmd = read_short(data, 4);
