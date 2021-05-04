@@ -34,7 +34,8 @@ const StringEntry = ({ evString }: { evString: EvString }) => {
 const TalkCommandEntry = ({ talkCommand }: { talkCommand: TalkCommand }) => {
   return (
     <div>
-      {talkCommand.offset} - Talk()
+      {talkCommand.offset} - Talk({talkCommand.params[0].toString(16)},{" "}
+      {talkCommand.params[1].toString(16)})
       <EvTexturePreview moduleId={talkCommand.getTextureId()} />
     </div>
   );

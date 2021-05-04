@@ -39,6 +39,7 @@ export const EvTexturePreview = ({ moduleId }: { moduleId: number }) => {
 
   return (
     <TexturePreview
+      scale={1}
       texture={evTexture}
       type={TextureType.EightBitClut}
       clut={clut}

@@ -7,7 +7,7 @@ export class TalkCommand extends BaseCommand {
     new ParamInfo(ParamType.Unknown),
   ];
 
-  constructor(offset: number, private params: number[]) {
+  constructor(offset: number, public params: number[]) {
     super(offset);
   }
 
@@ -23,6 +23,7 @@ export class TalkCommand extends BaseCommand {
   }
 
   private charIdToDataCharId(charId: number) {
+    if (charId === 0) return 0xff;
     return charId - 1;
   }
 }

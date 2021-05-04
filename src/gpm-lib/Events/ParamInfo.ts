@@ -2,6 +2,7 @@ export enum ParamType {
   Unknown,
   Character,
   EvSlot,
+  Label,
 }
 
 export class ParamInfo {
