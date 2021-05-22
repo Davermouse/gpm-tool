@@ -1,3 +1,7 @@
+import Accordion from "@material-ui/core/Accordion";
+import AccordionSummary from "@material-ui/core/AccordionSummary";
+import AccordionDetails from "@material-ui/core/AccordionDetails";
+
 import { cmd_to_string } from "../gpm-lib/evdata";
 import { BaseCommand } from "../gpm-lib/Events/BaseCommand";
 import { TalkCommand } from "../gpm-lib/Events/Commands/TalkCommand";
@@ -25,19 +29,26 @@ const elementFromCommand = (command: BaseCommand) => {
 
 const StringEntry = ({ evString }: { evString: EvString }) => {
   return (
-    <div>
+    <>
       {evString.offset} - {evString.text}
-    </div>
+    </>
   );
 };
 
 const TalkCommandEntry = ({ talkCommand }: { talkCommand: TalkCommand }) => {
   return (
-    <div>
-      {talkCommand.offset} - Talk({talkCommand.params[0].toString(16)},{" "}
-      {talkCommand.params[1].toString(16)})
-      <EvTexturePreview moduleId={talkCommand.getTextureId()} />
-    </div>
+    <Accordion>
+      <AccordionSummary>
+        {talkCommand.offset} - Talk(
+        {talkCommand.paramInfo
+          .map((p, i) => `0x${talkCommand.params[i].toString(16)}`)
+          .join(",")}
+        )
+      </AccordionSummary>
+      <AccordionDetails>
+        <EvTexturePreview moduleId={talkCommand.getTextureId()} />
+      </AccordionDetails>
+    </Accordion>
   );
 };
 
@@ -49,10 +60,14 @@ const UnknownCommandEntry = ({
   const cmdData = cmd_to_string(unknownCommand.cmd);
 
   return (
-    <div>
-      {unknownCommand.offset} - {cmdData.title}(
-      {unknownCommand.params.map((p) => `0x${p.toString(16)}`).join(",")})
-    </div>
+    <Accordion>
+      <AccordionSummary>
+        {" "}
+        {unknownCommand.offset} - {cmdData.title}(
+        {unknownCommand.params.map((p) => `0x${p.toString(16)}`).join(",")})
+      </AccordionSummary>
+      <AccordionDetails>asdsad</AccordionDetails>
+    </Accordion>
   );
 };
 

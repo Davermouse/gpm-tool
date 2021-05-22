@@ -65,23 +65,13 @@ export const TexturePreview = observer<
     const pixelData = p.data;
     const activeClut = clut || greyClut;
 
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        let pixel: number = 0;
+    const clutImageData: ImageData[] = [];
 
-        // Each pixel is 16 bits and full color
-        if (type === TextureType.FullColor) {
-          const pixelOffset = (y * width + x) * 2;
-          pixel = read_short(texture, pixelOffset);
-        } else if (type === TextureType.EightBitClut) {
-          const pixelOffset = y * width + x;
-
-          pixel = activeClut[texture[pixelOffset]];
-        }
-
-        if (pixel === undefined) {
-          continue;
-        }
+    if (type === TextureType.EightBitClut) {
+      for (let i = 0; i < 256; i++) {
+        const pixel = activeClut[i];
+        const p = context.createImageData(scale, scale);
+        const pixelData = p.data;
 
         const r = pixel & 0b0000000000011111;
         const g = (pixel & 0b0000001111100000) >>> 5;
@@ -93,14 +83,28 @@ export const TexturePreview = observer<
             pixelData[po] = (r / 0x1f) * 256;
             pixelData[po + 1] = (g / 0x1f) * 256;
             pixelData[po + 2] = (b / 0x1f) * 256;
-            pixelData[po + 3] = 256;
+            pixelData[po + 3] = t ? 0 : 256;
           }
         }
 
-        context.putImageData(p, x * scale, y * scale);
+        clutImageData.push(p);
       }
     }
-  });
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const pixelOffset = y * width + x;
+
+        const pixel = clutImageData[texture[pixelOffset]];
+
+        if (pixel === undefined) {
+          continue;
+        }
+
+        context.putImageData(pixel, x * scale, y * scale);
+      }
+    }
+  }, [texture, width]);
 
   return (
     <div>
@@ -109,7 +113,6 @@ export const TexturePreview = observer<
         type="number"
         value={width}
         onChange={(e) => setWidth(parseInt(e.currentTarget.value))}
-        style={{ float: "right" }}
       />
     </div>
   );

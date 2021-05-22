@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import logo from "./logo.svg";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+
 import "./App.css";
 import { useGPMToolContext } from "./context/GPMToolContext";
 import { GPMFileList } from "./controls/GPMFileList";
@@ -22,7 +23,6 @@ import IconButton from "@material-ui/core/IconButton";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
-import Link from "@material-ui/core/Link";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import NotificationsIcon from "@material-ui/icons/Notifications";
@@ -137,80 +137,111 @@ function App() {
     fileStore?.loadFile("/data/TALK1.BIN");
     fileStore?.loadFile("/data/STWINDOW.BIN");
     fileStore?.loadFile("/data/MAINT.BIN");
+    fileStore?.loadFile("/data/FONTDATA.BIN");
+    fileStore?.loadFile("/data/MMAP.BIN");
+    fileStore?.loadFile("/data/GP_EFF.BIN");
+    fileStore?.loadFile("/data/MAPDATA.BIN");
   });
 
   return (
-    <div className="App">
-      <CssBaseline />
-      <AppBar className={classes.appBar}>
-        <Toolbar className={classes.toolbar}>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            className={clsx(
-              classes.menuButton,
-              open && classes.menuButtonHidden
-            )}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            component="h1"
-            variant="h6"
-            color="inherit"
-            noWrap
-            className={classes.title}
-          >
-            GPM Tool
-          </Typography>
-          <IconButton color="inherit"></IconButton>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        variant="permanent"
-        classes={{
-          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
-        }}
-        open={open}
-      >
-        <div className={classes.toolbarIcon}>
-          <IconButton onClick={handleDrawerClose}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </div>
-        <Divider />
-        <List>
-          <ListItem button>
-            <ListItemIcon>
-              <DashboardIcon />
-            </ListItemIcon>
-            <ListItemText primary="Dashboard" />
-          </ListItem>
-        </List>
-        <Divider />
-      </Drawer>
-      <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Paper className={classes.paper}>
-                <EVDataEvents />
-              </Paper>
-            </Grid>
-            <Grid item xs={12}>
-              <Paper className={classes.paper}>
-                <Title>Module texture browser</Title>
-                <ModuleTextureBrowser />
-              </Paper>
-            </Grid>
+    <Router>
+      <div className="App">
+        <CssBaseline />
+        <AppBar className={classes.appBar}>
+          <Toolbar className={classes.toolbar}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              className={clsx(
+                classes.menuButton,
+                open && classes.menuButtonHidden
+              )}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography
+              component="h1"
+              variant="h6"
+              color="inherit"
+              noWrap
+              className={classes.title}
+            >
+              GPM Tool
+            </Typography>
+            <IconButton color="inherit"></IconButton>
+          </Toolbar>
+        </AppBar>
+        <Drawer
+          variant="permanent"
+          classes={{
+            paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
+          }}
+          open={open}
+        >
+          <div className={classes.toolbarIcon}>
+            <IconButton onClick={handleDrawerClose}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </div>
+          <Divider />
+          <List>
+            <Link to="/">
+              <ListItem button>
+                <ListItemIcon>
+                  <DashboardIcon />
+                </ListItemIcon>
+                <ListItemText primary="Dashboard" />
+              </ListItem>
+            </Link>
+            <Link to="/events">
+              <ListItem button>
+                <ListItemIcon>
+                  <DashboardIcon />
+                </ListItemIcon>
+                <ListItemText primary="Events" />
+              </ListItem>
+            </Link>
+            <Link to="/module_textures">
+              <ListItem button>
+                <ListItemIcon>
+                  <DashboardIcon />
+                </ListItemIcon>
+                <ListItemText primary="Module textures" />
+              </ListItem>
+            </Link>
+          </List>
+          <Divider />
+        </Drawer>
+        <main className={classes.content}>
+          <div className={classes.appBarSpacer} />
+          <Container maxWidth="lg" className={classes.container}>
+            <Switch>
+              <Route path="/events">
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <Paper className={classes.paper}>
+                      <EVDataEvents />
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </Route>
+              <Route path="/module_textures">
+                <Grid item xs={12}>
+                  <Paper className={classes.paper}>
+                    <Title>Module texture browser</Title>
+                    <ModuleTextureBrowser />
+                  </Paper>
+                </Grid>
+              </Route>
+            </Switch>
+
             <GPMFileList />
-          </Grid>
-        </Container>
-      </main>
-    </div>
+          </Container>
+        </main>
+      </div>
+    </Router>
   );
 }
 
