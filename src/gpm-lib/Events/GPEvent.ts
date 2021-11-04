@@ -1,15 +1,50 @@
-import { read_short } from "../helpers";
+import { ContactsOutlined } from "@material-ui/icons";
+import { read_short, write_short } from "../helpers";
 import { BaseCommand } from "./BaseCommand";
 import { cmd_param_lengths } from "./CmdParamLengths";
 import { buildCommand } from "./Commands/buildCommand";
 import { EvString } from "./EvString";
 
+export const COMMAND_START = 0x1b;
+
 export class GPEvent {
   public commands: BaseCommand[] = [];
   public labels: { label: number; dest: number }[] = [];
+  public post_label_data: number[] = [];
 
-  constructor(data: Uint8Array) {
+  constructor(private data: Uint8Array) {
     this.populateCommands(data);
+  }
+
+  public serialize(): Uint8Array {
+    const data: number[] = [];
+
+    write_short(this.labels.length, data);
+
+    for (const label of this.labels) {
+      write_short(label.label, data);
+      write_short(label.dest, data);
+    }
+
+    write_short(0xffff, data);
+
+    for (const cmd of this.commands) {
+      const cmdData = cmd.serialize();
+
+      for (const b of cmdData) data.push(...cmd.serialize());
+    }
+
+    for (let i = 0; i < data.length; i++) {
+      if (this.data[i] !== data[i]) {
+        console.log(`Does not match at ${i}: ${this.data[i]} !== ${data[i]}`);
+
+        console.dir(this.data);
+        console.dir(data);
+        break;
+      }
+    }
+
+    return new Uint8Array(data);
   }
 
   private populateCommands(data: Uint8Array) {
@@ -38,7 +73,7 @@ export class GPEvent {
     while (curr < data.length) {
       let cmd_offset = curr;
 
-      if (data[curr] === 0x1b) {
+      if (data[curr] === COMMAND_START) {
         // This is a command)
         const cmd = data[curr + 1];
         const param_count = cmd_param_lengths[cmd];

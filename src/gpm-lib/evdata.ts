@@ -154,6 +154,10 @@ export function cmd_to_string(cmd: number): { title: string; params?: number } {
       return {
         title: "add_param",
       };
+    case 0x27:
+      return {
+        title: "status",
+      };
     case 0x28:
       return {
         title: "thrust",
@@ -195,6 +199,18 @@ export function cmd_to_string(cmd: number): { title: string; params?: number } {
       return {
         title: "bgm",
         params: 1,
+      };
+    case 0x32:
+      return {
+        title: "mojicloseall",
+      };
+    case 0x33:
+      return {
+        title: "wakuopen",
+      };
+    case 0x34:
+      return {
+        title: "finish",
       };
     case 0x35:
       return {
@@ -239,6 +255,14 @@ export function cmd_to_string(cmd: number): { title: string; params?: number } {
         title: "getitem",
         params: 3,
       };
+    case 0x3f:
+      return {
+        title: "submoney",
+      };
+    case 0x40:
+      return {
+        title: "penniless",
+      };
     case 0x45:
       return {
         title: "ifsex",
@@ -262,6 +286,14 @@ export function cmd_to_string(cmd: number): { title: string; params?: number } {
         title: "charwarp",
         params: 2,
       };
+    case 0x56:
+      return {
+        title: "charmove",
+      };
+    case 0x57:
+      return {
+        title: "flash",
+      };
     case 0x58:
       return {
         title: "mojiopenfade",
@@ -284,6 +316,10 @@ export function cmd_to_string(cmd: number): { title: string; params?: number } {
       return {
         title: "ifjob",
         params: 4,
+      };
+    case 0x65:
+      return {
+        title: "fuzzy",
       };
     case 102:
       return {
@@ -316,10 +352,18 @@ export function cmd_to_string(cmd: number): { title: string; params?: number } {
         title: "strname2",
         params: 3,
       };
+    case 0x7b:
+      return {
+        title: "remove",
+      };
     case 0x7f:
       return {
         title: "chengen",
         params: 1,
+      };
+    case 0x80:
+      return {
+        title: "randwarp",
       };
     case 0x81:
       return {
@@ -426,6 +470,10 @@ export function cmd_to_string(cmd: number): { title: string; params?: number } {
         title: "feelingreset",
         params: 3,
       };
+    case 0xb1:
+      return {
+        title: "setlesson",
+      };
     case 0xb4:
       return {
         title: "trgturn",
@@ -434,6 +482,10 @@ export function cmd_to_string(cmd: number): { title: string; params?: number } {
     case 0xb9:
       return {
         title: "ending",
+      };
+    case 0xba:
+      return {
+        title: "se_ex",
       };
     case 0xc0:
       return {
@@ -492,16 +544,7 @@ export function cmd_to_string(cmd: number): { title: string; params?: number } {
       return {
         title: "pausew",
       };
-    case 0xe2:
-      return {
-        title: "charrun",
-        params: 5,
-      };
-    case 0xeb:
-      return {
-        title: "charset",
-        params: 1,
-      };
+
     case 0xde:
       return {
         title: "charwalk",
@@ -522,6 +565,11 @@ export function cmd_to_string(cmd: number): { title: string; params?: number } {
         title: "charrot",
         params: 2,
       };
+    case 0xe2:
+      return {
+        title: "charrun",
+        params: 5,
+      };
     case 0xe3:
       return {
         title: "noresumes",
@@ -532,6 +580,43 @@ export function cmd_to_string(cmd: number): { title: string; params?: number } {
         title: "motion",
         params: 4,
       };
+    case 0xe5:
+      return {
+        title: "delete_se",
+      };
+    case 0xe6:
+      return {
+        title: "get_sex_hndl",
+      };
+    case 0xe7:
+      return {
+        title: "stop_se_ex",
+      };
+    case 0xe8:
+      return {
+        title: "drawsync",
+      };
+    case 0xe9:
+      return {
+        title: "reloadchar",
+      };
+    case 0xea:
+      return {
+        title: "withwalkmai",
+      };
+    case 0xeb:
+      return {
+        title: "charset",
+        params: 1,
+      };
+    case 0xec:
+      return {
+        title: "goto_char_class",
+      };
+    case 0xed:
+      return {
+        title: "flameingofglamein",
+      };
     case 0xee:
       return {
         title: "fuzzy1st",
@@ -541,6 +626,30 @@ export function cmd_to_string(cmd: number): { title: string; params?: number } {
       return {
         title: "setbus",
         params: 1,
+      };
+    case 0xf0:
+      return {
+        title: "winname",
+      };
+    case 0xf1:
+      return {
+        title: "ifgrade",
+      };
+    case 0xf2:
+      return {
+        title: "deathstack",
+      };
+    case 0xf3:
+      return {
+        title: "resetrelations",
+      };
+    case 0xfd:
+      return {
+        title: "ifdate",
+      };
+    case 0xfe:
+      return {
+        title: "startmap",
       };
     case 0xff:
       return {

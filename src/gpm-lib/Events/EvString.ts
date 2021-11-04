@@ -11,4 +11,8 @@ export class EvString extends BaseCommand {
 
     this.text = shiftjis.decode(data);
   }
+
+  public serialize(): number[] {
+    return shiftjis.encode(this.text);
+  }
 }

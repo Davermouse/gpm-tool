@@ -29,6 +29,7 @@ import NotificationsIcon from "@material-ui/icons/Notifications";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import { makeStyles } from "@material-ui/core";
 import clsx from "clsx";
+import { Characters } from "./controls/Characters";
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -128,19 +129,7 @@ function App() {
   const { fileStore } = useGPMToolContext();
 
   useEffect(() => {
-    fileStore?.loadFile("/data/TITLEV.BIN");
-    fileStore?.loadFile("/data/TEXTURE.BIN");
-    fileStore?.loadFile("/data/AROUND.BIN");
-    fileStore?.loadFile("/data/EVDATA.BIN");
-    fileStore?.loadFile("/data/FACES.BIN");
-    fileStore?.loadFile("/data/FACEM.BIN");
-    fileStore?.loadFile("/data/TALK1.BIN");
-    fileStore?.loadFile("/data/STWINDOW.BIN");
-    fileStore?.loadFile("/data/MAINT.BIN");
-    fileStore?.loadFile("/data/FONTDATA.BIN");
-    fileStore?.loadFile("/data/MMAP.BIN");
-    fileStore?.loadFile("/data/GP_EFF.BIN");
-    fileStore?.loadFile("/data/MAPDATA.BIN");
+    fileStore?.loadIso("/data/gpm01.iso");
   });
 
   return (
@@ -203,12 +192,28 @@ function App() {
                 <ListItemText primary="Events" />
               </ListItem>
             </Link>
+            <Link to="/characters">
+              <ListItem button>
+                <ListItemIcon>
+                  <DashboardIcon />
+                </ListItemIcon>
+                <ListItemText primary="Characters" />
+              </ListItem>
+            </Link>
             <Link to="/module_textures">
               <ListItem button>
                 <ListItemIcon>
                   <DashboardIcon />
                 </ListItemIcon>
                 <ListItemText primary="Module textures" />
+              </ListItem>
+            </Link>
+            <Link to="/files">
+              <ListItem button>
+                <ListItemIcon>
+                  <DashboardIcon />
+                </ListItemIcon>
+                <ListItemText primary="Files" />
               </ListItem>
             </Link>
           </List>
@@ -235,9 +240,23 @@ function App() {
                   </Paper>
                 </Grid>
               </Route>
+              <Route path="/characters">
+                <Grid item xs={12}>
+                  <Paper className={classes.paper}>
+                    <Title>Characters</Title>
+                    <Characters />
+                  </Paper>
+                </Grid>
+              </Route>
+              <Route path="/files">
+                <Grid item xs={12}>
+                  <Paper className={classes.paper}>
+                    <Title>Files</Title>
+                    <GPMFileList />
+                  </Paper>
+                </Grid>
+              </Route>
             </Switch>
-
-            <GPMFileList />
           </Container>
         </main>
       </div>

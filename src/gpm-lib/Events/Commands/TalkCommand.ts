@@ -1,4 +1,7 @@
+import { serialize_short, write_short } from "../../helpers";
 import { BaseCommand } from "../BaseCommand";
+import { COMMAND_START } from "../GPEvent";
+import { computeTextureId } from "../Helpers/CharacterHelpers";
 import { ParamInfo, ParamType } from "../ParamInfo";
 
 export class TalkCommand extends BaseCommand {
@@ -12,18 +15,15 @@ export class TalkCommand extends BaseCommand {
   }
 
   public getTextureId() {
-    return this.computeTextureId(this.params[0], this.params[1]);
+    return computeTextureId(this.params[0], this.params[1]);
   }
 
-  private computeTextureId(charId: number, mood: number) {
-    const dataCharId = this.charIdToDataCharId(charId);
-    const wrappedMood = (mood - 1) & 0xff;
+  public serialize(): number[] {
+    const array = [COMMAND_START];
+    array.push(15);
+    array.push(...serialize_short(this.params[0]));
+    array.push(...serialize_short(this.params[1]));
 
-    return dataCharId * 0xd + wrappedMood + 0x4a0 - 1; // This -1 is manual and wrong :(
-  }
-
-  private charIdToDataCharId(charId: number) {
-    if (charId === 0) return 0xff;
-    return charId - 1;
+    return array;
   }
 }

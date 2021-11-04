@@ -44,7 +44,14 @@ export const TexturePreview = observer<
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvasWidth = 325 * scale;
   const canvasHeight = 250 * scale;
-  let [width, setWidth] = useState(184);
+
+  let initialWidth = 181;
+
+  while (texture.length % initialWidth !== 0) {
+    initialWidth++;
+  }
+
+  let [width, setWidth] = useState(initialWidth);
 
   useEffect(() => {
     if (!texture || !canvasRef.current) return;
@@ -62,7 +69,6 @@ export const TexturePreview = observer<
         : (texture.length / width) * 2;
 
     const p = context.createImageData(scale, scale);
-    const pixelData = p.data;
     const activeClut = clut || greyClut;
 
     const clutImageData: ImageData[] = [];

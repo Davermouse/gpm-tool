@@ -20,12 +20,6 @@ export const EVDataEvents = observer(() => {
     return <>EVData not loaded</>;
   }
 
-  const evdatafile = fileStore.files.find(
-    (f) => f.name.indexOf("EVDATA") !== -1
-  );
-
-  if (!evdatafile?.data) return <>EVDATA not loaded</>;
-
   const module = fileStore.evFile.getModule(currentOffset);
 
   return (

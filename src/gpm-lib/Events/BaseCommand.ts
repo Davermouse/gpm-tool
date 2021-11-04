@@ -7,4 +7,6 @@ export abstract class BaseCommand {
   constructor(offset: number) {
     this.offset = offset;
   }
+
+  public abstract serialize(): number[];
 }

@@ -3,16 +3,15 @@ import request from "superagent";
 import { BinModule } from "../gpm-lib/BinModule";
 
 import { EvFile } from "../gpm-lib/EvFile";
+import { GPMISO } from "../gpm-lib/GpmIso";
 
 class GPMFile {
-  public name: string;
-  public data?: Uint8Array;
-  public module?: BinModule;
-
-  constructor(name: string) {
+  constructor(
+    public name: string,
+    public data: Uint8Array,
+    public module: BinModule
+  ) {
     makeAutoObservable(this);
-
-    this.name = name;
   }
 }
 
@@ -24,23 +23,16 @@ export class FileStore {
     makeAutoObservable(this);
   }
 
-  public async loadFile(filename: string) {
-    if (this.files.find((f) => f.name === filename)) return;
-
-    const file = new GPMFile(filename);
-
-    this.files.push(file);
-
+  public async loadIso(filename: string) {
     const data = await request.get(filename).responseType("arraybuffer");
 
-    runInAction(() => {
-      file.data = new Uint8Array(data.xhr.response);
+    const iso = new GPMISO(Buffer.from(data.xhr.response));
 
-      if (filename.toUpperCase().indexOf("EVDATA") !== -1) {
-        this.evFile = new EvFile(file.data);
-      } else {
-        file.module = new BinModule(filename, file.data);
-      }
+    runInAction(() => {
+      console.log("Setting evFile");
+
+      this.evFile = iso.evData;
+      this.files = iso.files;
     });
   }
 

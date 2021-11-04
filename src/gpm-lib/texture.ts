@@ -216,11 +216,6 @@ return (short *)(mod_load_struct *)0x0;
 export function decompress_texture(buffer: Uint8Array, offset: number) {
   const output = [];
 
-  console.log(`Decompressing texture at offset ${offset.toString(16)}`);
-
-  console.log(buffer[offset].toString(16));
-  console.log(buffer[offset + 1].toString(16));
-
   var _place_in_texture_data = 0;
   var cond_temp_uint_2;
   let int_1;

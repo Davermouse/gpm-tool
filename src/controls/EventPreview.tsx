@@ -13,8 +13,6 @@ import { EvModule } from "../gpm-lib/EvFile";
 import styles from "./EventPreview.module.css";
 import { EvTexturePreview } from "./EVTexturePreview";
 
-const shiftjis = require("shiftjis");
-
 const elementFromCommand = (command: BaseCommand) => {
   if (command instanceof EvString) {
     return <StringEntry evString={command} />;
@@ -92,6 +90,9 @@ export const EventPreview = ({ module }: { module: EvModule }) => {
             ))}
           </tbody>
         </table>
+      </div>
+      <div>
+        <button onClick={() => event.serialize()}>Serialize</button>
       </div>
       <div>{event.commands.map((c) => elementFromCommand(c))}</div>
     </div>
