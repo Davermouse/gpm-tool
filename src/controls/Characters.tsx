@@ -2,7 +2,6 @@ import { useGPMToolContext } from "../context/GPMToolContext";
 import { computeTextureId } from "../gpm-lib/Events/Helpers/CharacterHelpers";
 import { EvModuleType } from "../gpm-lib/EvFile";
 import { EvTexturePreview } from "./EVTexturePreview";
-import { TexturePreview } from "./TexturePreview";
 
 export const Character: React.FC<{ characterId: number }> = ({
   characterId,

@@ -30,6 +30,9 @@ import DashboardIcon from "@material-ui/icons/Dashboard";
 import { makeStyles } from "@material-ui/core";
 import clsx from "clsx";
 import { Characters } from "./controls/Characters";
+import { Publish as PublishIcon } from "@material-ui/icons";
+import { Publish } from "./controls/Publish";
+import { Upload } from "./controls/Upload";
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -216,6 +219,14 @@ function App() {
                 <ListItemText primary="Files" />
               </ListItem>
             </Link>
+            <Link to="/publish">
+              <ListItem button>
+                <ListItemIcon>
+                  <PublishIcon />
+                </ListItemIcon>
+                <ListItemText primary="Publish" />
+              </ListItem>
+            </Link>
           </List>
           <Divider />
         </Drawer>
@@ -253,6 +264,22 @@ function App() {
                   <Paper className={classes.paper}>
                     <Title>Files</Title>
                     <GPMFileList />
+                  </Paper>
+                </Grid>
+              </Route>
+              <Route path="/publish">
+                <Grid item xs={12}>
+                  <Paper className={classes.paper}>
+                    <Title>Publish</Title>
+                    <Publish />
+                  </Paper>
+                </Grid>
+              </Route>
+              <Route path="/">
+                <Grid item xs={12}>
+                  <Paper className={classes.paper}>
+                    <Title>Dashboard</Title>
+                    <Upload />
                   </Paper>
                 </Grid>
               </Route>

@@ -1,11 +1,17 @@
 import { read_short, read_int } from "./helpers";
 import { decompress_texture } from "./texture";
 
+export interface Texture {
+  w: number;
+  h: number;
+  data: Uint8Array;
+}
+
 export class BinModule {
   public module_num: number = -1;
   public entries: number = -1;
 
-  private textureCache: { [id: number]: Uint8Array } = {};
+  private textureCache: { [id: number]: Texture } = {};
 
   constructor(public name: string, public data: Uint8Array) {
     this.load();
@@ -36,7 +42,7 @@ export class BinModule {
       */
     const entry_id = (id - this.module_num * 0x100) & 0xffff;
 
-    if (entry_id < 0 || entry_id > this.module_num) return 0;
+    if (entry_id < 0 || entry_id > this.entries) return 0;
 
     console.log(`Entry ID: ${entry_id}`);
 
@@ -47,24 +53,31 @@ export class BinModule {
     return offset;
   }
 
-  findTexture(id: number) {
+  findTexture(id: number): Texture | null {
     if (this.textureCache[id]) return this.textureCache[id];
 
     const data_offset = this.findModule(id);
 
     if (data_offset === 0) return null;
 
-    const a = read_short(this.data, data_offset);
+    const w = read_short(this.data, data_offset) * 2;
+    const h = read_short(this.data, data_offset + 2);
     const b = read_int(this.data, data_offset) >>> 0x10;
     const c = read_int(this.data, data_offset) >>> 0x1e;
 
     //  const mod_data = load_mod_data(a, b, c);
 
     const texture_offset = data_offset + 8;
-    console.log(read_int(this.data, data_offset).toString(16));
-    console.log(read_int(this.data, data_offset + 4).toString(16));
+    console.log(w);
+    console.log(h);
 
-    const texture = decompress_texture(this.data, texture_offset);
+    const data = decompress_texture(this.data, texture_offset);
+
+    const texture = {
+      w,
+      h,
+      data,
+    };
 
     this.textureCache[id] = texture;
 

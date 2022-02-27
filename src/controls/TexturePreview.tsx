@@ -1,5 +1,6 @@
 import { observer } from "mobx-react";
 import React, { useEffect, useRef, useState } from "react";
+import { Texture } from "../gpm-lib/BinModule";
 import { read_short } from "../gpm-lib/helpers";
 
 export enum TextureType {
@@ -35,7 +36,7 @@ const textureDimensions = {
 
 export const TexturePreview = observer<
   React.FC<{
-    texture: Uint8Array;
+    texture: Texture;
     type: TextureType;
     clut?: Uint16Array;
     scale: number;
@@ -45,13 +46,38 @@ export const TexturePreview = observer<
   const canvasWidth = 325 * scale;
   const canvasHeight = 250 * scale;
 
-  let initialWidth = 181;
+  const validSizes: {
+    text: string;
+    w: number;
+    h: number;
+  }[] = [];
 
-  while (texture.length % initialWidth !== 0) {
-    initialWidth++;
+  for (let w = 0; w < texture.data.length; w++) {
+    if (texture.data.length % w === 0) {
+      let h = texture.data.length / w;
+      validSizes.push({
+        text: `${w} x ${h}`,
+        w,
+        h,
+      });
+    }
   }
 
-  let [width, setWidth] = useState(initialWidth);
+  let [selectedSizeIndex, setSelectedSizeIndex] = useState("0");
+
+  useEffect(() => {
+    if (texture) {
+      const i = validSizes.findIndex(
+        (vs) => vs.h === texture.h && vs.w === texture.w
+      );
+
+      if (i !== -1) {
+        setSelectedSizeIndex(i.toString());
+      } else {
+        setSelectedSizeIndex(Math.floor(validSizes.length / 2).toString());
+      }
+    }
+  }, [texture]);
 
   useEffect(() => {
     if (!texture || !canvasRef.current) return;
@@ -61,14 +87,17 @@ export const TexturePreview = observer<
     if (!context) return;
 
     context.clearRect(0, 0, canvasWidth, canvasHeight);
-    const height =
-      type === TextureType.FullColor
+
+    const size = validSizes[parseInt(selectedSizeIndex)];
+
+    const width = size ? size.w : 1;
+    const height = size ? size.h : 1;
+    /*type === TextureType.FullColor
         ? texture.length / width / 2
         : type === TextureType.EightBitClut
         ? texture.length / width
-        : (texture.length / width) * 2;
+        : (texture.length / width) * 2;*/
 
-    const p = context.createImageData(scale, scale);
     const activeClut = clut || greyClut;
 
     const clutImageData: ImageData[] = [];
@@ -101,7 +130,7 @@ export const TexturePreview = observer<
       for (let x = 0; x < width; x++) {
         const pixelOffset = y * width + x;
 
-        const pixel = clutImageData[texture[pixelOffset]];
+        const pixel = clutImageData[texture.data[pixelOffset]];
 
         if (pixel === undefined) {
           continue;
@@ -110,16 +139,22 @@ export const TexturePreview = observer<
         context.putImageData(pixel, x * scale, y * scale);
       }
     }
-  }, [texture, width]);
+  }, [texture, selectedSizeIndex]);
 
   return (
     <div>
       <canvas ref={canvasRef} width={canvasWidth} height={canvasHeight} />
-      <input
-        type="number"
-        value={width}
-        onChange={(e) => setWidth(parseInt(e.currentTarget.value))}
-      />
+
+      <select
+        value={selectedSizeIndex}
+        onChange={(e) => setSelectedSizeIndex(e.currentTarget.value)}
+      >
+        {validSizes.map((vs, i) => (
+          <option key={i} value={i.toString()}>
+            {vs.text}
+          </option>
+        ))}
+      </select>
     </div>
   );
 });

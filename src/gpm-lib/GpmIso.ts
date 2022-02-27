@@ -23,6 +23,7 @@ const MODULE_FILES = [
   "/DATA/FREEALL.BIN;1",
   "/DATA/FZDATAS.BIN;1",
   "/DATA/FZLIGHT.BIN;1",
+  "/DATA/TIMEFONT.BIN;1",
 ];
 
 class GPMFile {

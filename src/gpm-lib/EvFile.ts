@@ -21,6 +21,10 @@ export class EvModule {
     this.data = rawData.slice(2);
   }
 
+  public replaceData(data: Uint8Array) {
+    this.rawData.set(data, 2);
+  }
+
   get friendlyType() {
     switch (this.type) {
       case EvModuleType.Event:

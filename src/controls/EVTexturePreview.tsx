@@ -35,7 +35,11 @@ export const EvTexturePreview = ({ moduleId }: { moduleId: number }) => {
   }
 
   const clut = coloredClutFromRaw(module.data.slice(0 + 4, 512 + 4));
-  const evTexture = decompress_texture(module.data.slice(0x212 + 4), 0); // evdatafile.data, 0x5fd218);
+  const evTexture = {
+    w: 0,
+    h: 0,
+    data: decompress_texture(module.data.slice(0x212 + 4), 0),
+  };
 
   return (
     <TexturePreview

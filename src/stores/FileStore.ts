@@ -1,6 +1,7 @@
 import { makeAutoObservable, runInAction } from "mobx";
+import { Buffer } from "buffer";
 import request from "superagent";
-import { BinModule } from "../gpm-lib/BinModule";
+import { BinModule, Texture } from "../gpm-lib/BinModule";
 
 import { EvFile } from "../gpm-lib/EvFile";
 import { GPMISO } from "../gpm-lib/GpmIso";
@@ -19,6 +20,8 @@ export class FileStore {
   public files: GPMFile[] = [];
   public evFile: EvFile | null = null;
 
+  private rawIso: Buffer | null = null;
+
   constructor() {
     makeAutoObservable(this);
   }
@@ -26,14 +29,31 @@ export class FileStore {
   public async loadIso(filename: string) {
     const data = await request.get(filename).responseType("arraybuffer");
 
-    const iso = new GPMISO(Buffer.from(data.xhr.response));
+    this.loadIsoData(data.xhr.response);
+  }
+
+  public async loadIsoData(buffer: Buffer) {
+    this.rawIso = buffer;
+
+    const iso = new GPMISO(Buffer.from(buffer));
 
     runInAction(() => {
       console.log("Setting evFile");
 
       this.evFile = iso.evData;
-      this.files = iso.files;
+      this.files = iso.files.sort(
+        (a, b) => a.module.module_num - b.module.module_num
+      );
     });
+  }
+
+  public publishIso(): string {
+    if (this.rawIso) {
+      const url = URL.createObjectURL(new Blob([this.rawIso]));
+      return url;
+    }
+
+    return "";
   }
 
   public getModule(id: number): BinModule | undefined {
@@ -41,7 +61,7 @@ export class FileStore {
       ?.module;
   }
 
-  public findTexture(id: number): Uint8Array | null {
+  public findTexture(id: number): Texture | null {
     const moduleId = id >>> 8;
 
     const module = this.getModule(moduleId);

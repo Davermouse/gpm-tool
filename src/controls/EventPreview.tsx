@@ -12,6 +12,7 @@ import { EvModule } from "../gpm-lib/EvFile";
 
 import styles from "./EventPreview.module.css";
 import { EvTexturePreview } from "./EVTexturePreview";
+import { useState } from "react";
 
 const elementFromCommand = (command: BaseCommand) => {
   if (command instanceof EvString) {
@@ -25,11 +26,31 @@ const elementFromCommand = (command: BaseCommand) => {
   }
 };
 
-const StringEntry = ({ evString }: { evString: EvString }) => {
+const Label = ({ command }: { command: BaseCommand }) => {
   return (
-    <>
-      {evString.offset} - {evString.text}
-    </>
+    <div
+      className={styles.label}
+      id={command.label ? `label-${command.label}` : undefined}
+    >
+      {command.label ? `${command.label.toString(16)}:` : ""}
+    </div>
+  );
+};
+
+const StringEntry = ({ evString }: { evString: EvString }) => {
+  const [text, setText] = useState(evString.text);
+
+  return (
+    <Accordion>
+      <AccordionSummary>
+        <div className={styles.label} />
+        {evString.text}
+      </AccordionSummary>
+      <AccordionDetails>
+        <input value={text} onChange={(e) => setText(e.currentTarget.value)} />
+        <button onClick={() => (evString.text = text)}>Save</button>
+      </AccordionDetails>
+    </Accordion>
   );
 };
 
@@ -37,7 +58,8 @@ const TalkCommandEntry = ({ talkCommand }: { talkCommand: TalkCommand }) => {
   return (
     <Accordion>
       <AccordionSummary>
-        {talkCommand.offset} - Talk(
+        <Label command={talkCommand} />
+        Talk(
         {talkCommand.paramInfo
           .map((p, i) => `0x${talkCommand.params[i].toString(16)}`)
           .join(",")}
@@ -60,8 +82,8 @@ const UnknownCommandEntry = ({
   return (
     <Accordion>
       <AccordionSummary>
-        {" "}
-        {unknownCommand.offset} - {cmdData.title}(
+        <Label command={unknownCommand} />
+        {cmdData.title}(
         {unknownCommand.params.map((p) => `0x${p.toString(16)}`).join(",")})
       </AccordionSummary>
       <AccordionDetails>asdsad</AccordionDetails>
@@ -71,6 +93,12 @@ const UnknownCommandEntry = ({
 
 export const EventPreview = ({ module }: { module: EvModule }) => {
   const event = new GPEvent(module.data);
+
+  const serialize = () => {
+    const d = event.serialize();
+
+    module.replaceData(d);
+  };
 
   return (
     <div>
@@ -85,14 +113,16 @@ export const EventPreview = ({ module }: { module: EvModule }) => {
             {event.labels.map((l) => (
               <tr>
                 <td>{l.label.toString(16)}</td>
-                <td>{l.dest}</td>
+                <td>
+                  <a href={`#label-${l.label}`}>{l.dest}</a>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       <div>
-        <button onClick={() => event.serialize()}>Serialize</button>
+        <button onClick={() => serialize()}>Serialize</button>
       </div>
       <div>{event.commands.map((c) => elementFromCommand(c))}</div>
     </div>

@@ -1,5 +1,4 @@
-import { ContactsOutlined } from "@material-ui/icons";
-import { read_short, write_short } from "../helpers";
+import { overwrite_short, read_short, write_short } from "../helpers";
 import { BaseCommand } from "./BaseCommand";
 import { cmd_param_lengths } from "./CmdParamLengths";
 import { buildCommand } from "./Commands/buildCommand";
@@ -19,24 +18,48 @@ export class GPEvent {
   public serialize(): Uint8Array {
     const data: number[] = [];
 
-    write_short(this.labels.length, data);
+    write_short((this.labels.length + 2) * 4, data);
 
     for (const label of this.labels) {
       write_short(label.label, data);
-      write_short(label.dest, data);
+
+      // We'll fix these up later, as we won't know the precise offsets until after
+      // we serialize the commands themselves.
+      write_short(0, data);
     }
 
     write_short(0xffff, data);
 
-    for (const cmd of this.commands) {
-      const cmdData = cmd.serialize();
+    // This is normally the length of the event?
+    write_short(0xffff, data);
 
-      for (const b of cmdData) data.push(...cmd.serialize());
+    for (const cmd of this.commands) {
+      if (cmd.label) {
+        const l = this.labels.find((l) => l.label === cmd.label);
+
+        if (!l) {
+          console.error(`Unable to find label with name ${cmd.label}`);
+        } else {
+          // There's a magic byte in the event stream that the GOTO skips, so do that here too
+          l.dest = data.length + 2;
+        }
+      }
+
+      data.push(...cmd.serialize());
     }
+
+    this.labels.forEach((label, i) => {
+      // Skip the initial count, then skip previous labels, then skip to dest part
+      overwrite_short(label.dest, data, 2 + i * 4 + 2);
+    });
 
     for (let i = 0; i < data.length; i++) {
       if (this.data[i] !== data[i]) {
-        console.log(`Does not match at ${i}: ${this.data[i]} !== ${data[i]}`);
+        console.log(
+          `Does not match at ${i}: Orig ${this.data[i].toString(
+            16
+          )} !== New ${data[i].toString(16)}`
+        );
 
         console.dir(this.data);
         console.dir(data);
@@ -60,14 +83,14 @@ export class GPEvent {
       const label = read_short(data, 2 + labelIndex * 4);
       const dest = read_short(data, 4 + labelIndex * 4);
 
+      // There is sometimes some data inbetween the labels and the start of the
+      // commands, but I don't know what that does yet...
+      if (label === 0xffff) break;
+
       this.labels.push({
         label,
         dest,
       });
-
-      // There is sometimes some data inbetween the labels and the start of the
-      // commands, but I don't know what that does yet...
-      if (label === 0xffff) break;
     }
 
     while (curr < data.length) {
@@ -81,7 +104,15 @@ export class GPEvent {
           .fill(0)
           .map((_, i) => read_short(data, curr + 2 + i * 2));
 
-        this.commands.push(buildCommand(cmd_offset, cmd, params));
+        const command = buildCommand(cmd_offset, cmd, params);
+
+        const label = this.labels.find((l) => l.dest === curr + 2);
+
+        if (label) {
+          command.label = label.label;
+        }
+
+        this.commands.push(command);
 
         curr += 2 + 2 * param_count;
       } else {

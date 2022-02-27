@@ -1,3 +1,7 @@
 .unknown {
-    background-color: red;;
+  background-color: red;
+}
+
+.label {
+  width: 50px;
 }
