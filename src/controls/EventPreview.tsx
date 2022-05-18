@@ -12,15 +12,18 @@ import { EvModule } from "../gpm-lib/EvFile";
 
 import styles from "./EventPreview.module.css";
 import { EvTexturePreview } from "./EVTexturePreview";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { FaceOnCommand } from "../gpm-lib/Events/Commands/FaceOnCommand";
 
-const elementFromCommand = (command: BaseCommand) => {
+const elementFromCommand = (index: number, command: BaseCommand) => {
   if (command instanceof EvString) {
-    return <StringEntry evString={command} />;
+    return <StringEntry key={index} evString={command} />;
   } else if (command instanceof UnknownCommand) {
-    return <UnknownCommandEntry unknownCommand={command} />;
+    return <UnknownCommandEntry key={index} unknownCommand={command} />;
   } else if (command instanceof TalkCommand) {
-    return <TalkCommandEntry talkCommand={command} />;
+    return <TalkCommandEntry key={index} talkCommand={command} />;
+  } else if (command instanceof FaceOnCommand) {
+    return <FaceOnCommandEntry key={index} command={command} />;
   } else {
     return <div>Unknown command type</div>;
   }
@@ -39,6 +42,10 @@ const Label = ({ command }: { command: BaseCommand }) => {
 
 const StringEntry = ({ evString }: { evString: EvString }) => {
   const [text, setText] = useState(evString.text);
+
+  useEffect(() => {
+    setText(evString.text);
+  }, [evString]);
 
   return (
     <Accordion>
@@ -67,6 +74,24 @@ const TalkCommandEntry = ({ talkCommand }: { talkCommand: TalkCommand }) => {
       </AccordionSummary>
       <AccordionDetails>
         <EvTexturePreview moduleId={talkCommand.getTextureId()} />
+      </AccordionDetails>
+    </Accordion>
+  );
+};
+
+const FaceOnCommandEntry = ({ command }: { command: FaceOnCommand }) => {
+  return (
+    <Accordion>
+      <AccordionSummary>
+        <Label command={command} />
+        FaceOn(
+        {command.paramInfo
+          .map((p, i) => `0x${command.params[i].toString(16)}`)
+          .join(",")}
+        )
+      </AccordionSummary>
+      <AccordionDetails>
+        <EvTexturePreview moduleId={command.getTextureId()} />
       </AccordionDetails>
     </Accordion>
   );
@@ -106,12 +131,14 @@ export const EventPreview = ({ module }: { module: EvModule }) => {
       <div>
         <table>
           <thead>
-            <th>Label</th>
-            <th>Destination</th>
+            <tr>
+              <th>Label</th>
+              <th>Destination</th>
+            </tr>
           </thead>
           <tbody>
             {event.labels.map((l) => (
-              <tr>
+              <tr key={l.label.toString()}>
                 <td>{l.label.toString(16)}</td>
                 <td>
                   <a href={`#label-${l.label}`}>{l.dest}</a>
@@ -124,7 +151,7 @@ export const EventPreview = ({ module }: { module: EvModule }) => {
       <div>
         <button onClick={() => serialize()}>Serialize</button>
       </div>
-      <div>{event.commands.map((c) => elementFromCommand(c))}</div>
+      <div>{event.commands.map((c, i) => elementFromCommand(i, c))}</div>
     </div>
   );
 };

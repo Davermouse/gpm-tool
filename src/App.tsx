@@ -33,6 +33,7 @@ import { Characters } from "./controls/Characters";
 import { Publish as PublishIcon } from "@material-ui/icons";
 import { Publish } from "./controls/Publish";
 import { Upload } from "./controls/Upload";
+import { Files } from "./controls/Files";
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -132,7 +133,8 @@ function App() {
   const { fileStore } = useGPMToolContext();
 
   useEffect(() => {
-    fileStore?.loadIso("/data/gpm01.iso");
+    //  fileStore?.loadIso("/data/gpm01.iso");
+    // fileStore?.loadIso("/data/gunparademarch.bin");
   });
 
   return (
@@ -263,7 +265,7 @@ function App() {
                 <Grid item xs={12}>
                   <Paper className={classes.paper}>
                     <Title>Files</Title>
-                    <GPMFileList />
+                    <Files />
                   </Paper>
                 </Grid>
               </Route>

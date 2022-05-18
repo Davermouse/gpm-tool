@@ -1,5 +1,7 @@
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
+
+import { Buffer } from "buffer";
 import { useGPMToolContext } from "../context/GPMToolContext";
 
 export const Upload = () => {
@@ -12,7 +14,7 @@ export const Upload = () => {
       const f = acceptedFiles[0];
 
       const buf = await f.arrayBuffer();
-      fileStore?.loadIsoData(Buffer.from(buf));
+      fileStore?.loadBinData(Buffer.from(buf));
     }
   }, []);
 
@@ -22,12 +24,12 @@ export const Upload = () => {
     isDragActive,
     isDragAccept,
     isDragReject,
-  } = useDropzone({ onDrop });
+  } = useDropzone({ onDrop, accept: [".bin"] });
 
   const area = (
     <div {...getRootProps()}>
       <input {...getInputProps()} />
-      <p>Drag 'n' drop some files here, or click to select files</p>
+      <p>Drag 'n' drop your .BIN file here, or click to open a file picker.</p>
     </div>
   );
 

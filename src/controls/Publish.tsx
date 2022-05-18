@@ -11,7 +11,7 @@ export const Publish = () => {
     const a = document.createElement("a");
 
     a.href = url;
-    a.download = `GPM-built.iso`;
+    a.download = `GPM-built.bin`;
 
     const clickHandler = () => {
       setTimeout(() => {

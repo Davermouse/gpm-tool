@@ -1,6 +1,10 @@
+import { Buffer } from "buffer";
+
+import { GPMISO } from "./GpmIso";
 import { read_short } from "./helpers";
 
 const OFFSETS_START = 0x01c000;
+const EVFILE = "/evdata.bin;1";
 
 export enum EvModuleType {
   Event = 0,
@@ -38,7 +42,11 @@ export class EvModule {
 }
 
 export class EvFile {
-  constructor(private data: Uint8Array) {}
+  private data: Uint8Array;
+
+  constructor(private iso: GPMISO) {
+    this.data = iso.iso.getFile(EVFILE);
+  }
 
   getModule(id: number) {
     const start = read_short(this.data, OFFSETS_START + 2 * (id + 1)) * 0x800;
@@ -49,5 +57,9 @@ export class EvFile {
     }
 
     return null;
+  }
+
+  updateISO() {
+    this.iso.iso.replaceFile(EVFILE, Buffer.from(this.data));
   }
 }

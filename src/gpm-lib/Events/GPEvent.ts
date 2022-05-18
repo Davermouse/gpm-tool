@@ -53,20 +53,6 @@ export class GPEvent {
       overwrite_short(label.dest, data, 2 + i * 4 + 2);
     });
 
-    for (let i = 0; i < data.length; i++) {
-      if (this.data[i] !== data[i]) {
-        console.log(
-          `Does not match at ${i}: Orig ${this.data[i].toString(
-            16
-          )} !== New ${data[i].toString(16)}`
-        );
-
-        console.dir(this.data);
-        console.dir(data);
-        break;
-      }
-    }
-
     return new Uint8Array(data);
   }
 

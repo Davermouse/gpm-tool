@@ -5,6 +5,7 @@ import { BinModule, Texture } from "../gpm-lib/BinModule";
 
 import { EvFile } from "../gpm-lib/EvFile";
 import { GPMISO } from "../gpm-lib/GpmIso";
+import { IsoFile } from "../gpm-lib/IsoReader";
 
 class GPMFile {
   constructor(
@@ -19,8 +20,8 @@ class GPMFile {
 export class FileStore {
   public files: GPMFile[] = [];
   public evFile: EvFile | null = null;
-
   private rawIso: Buffer | null = null;
+  public iso: IsoFile | null = null;
 
   constructor() {
     makeAutoObservable(this);
@@ -29,7 +30,11 @@ export class FileStore {
   public async loadIso(filename: string) {
     const data = await request.get(filename).responseType("arraybuffer");
 
-    this.loadIsoData(data.xhr.response);
+    if (filename.toLowerCase().indexOf("iso") !== -1) {
+      this.loadIsoData(data.xhr.response);
+    } else if (filename.toLowerCase().indexOf("bin") !== -1) {
+      this.loadBinData(data.xhr.response);
+    }
   }
 
   public async loadIsoData(buffer: Buffer) {
@@ -47,9 +52,25 @@ export class FileStore {
     });
   }
 
+  public async loadBinData(buffer: Buffer) {
+    //const file = new IsoFile(Buffer.from(buffer));
+
+    const iso = new GPMISO(Buffer.from(buffer));
+
+    runInAction(() => {
+      console.log("Setting evFile");
+
+      this.iso = iso.iso;
+      this.evFile = iso.evData;
+      this.files = iso.files.sort(
+        (a, b) => a.module.module_num - b.module.module_num
+      );
+    });
+  }
+
   public publishIso(): string {
-    if (this.rawIso) {
-      const url = URL.createObjectURL(new Blob([this.rawIso]));
+    if (this.iso) {
+      const url = URL.createObjectURL(new Blob([this.iso.image]));
       return url;
     }
 

@@ -1,6 +1,6 @@
 import { BinModule } from "./BinModule";
 import { EvFile } from "./EvFile";
-import { ISO } from "./Iso";
+import { IsoFile } from "./IsoReader";
 
 const MODULE_FILES = [
   "/OTHER/TITLEV.BIN;1",
@@ -35,34 +35,26 @@ class GPMFile {
 }
 
 export class GPMISO {
-  private iso: ISO;
+  public iso: IsoFile;
   public evData: EvFile;
   public files: GPMFile[] = [];
 
   constructor(data: Buffer) {
-    this.iso = new ISO(data);
+    this.iso = new IsoFile(data);
 
-    if (this.iso.volumeDesciptor.volumeIdentifier !== "GUNPARADEMARCH") {
+    if (this.iso.header?.volumeId !== "GUNPARADEMARCH") {
       throw new Error(
-        `Unexpected volume title: '${this.iso.volumeDesciptor.volumeIdentifier}'`
+        `Unexpected volume title: '${this.iso.header?.volumeId}'`
       );
     }
 
-    const evDataEntry = this.iso.findEntry("/evdata.bin;1");
-
-    this.evData = new EvFile(
-      data.slice(
-        evDataEntry.dataStart,
-        evDataEntry.dataStart + evDataEntry.size
-      )
-    );
+    this.evData = new EvFile(this);
 
     for (let filename of MODULE_FILES) {
-      const file = this.iso.findEntry(filename);
-      const fileData = data.slice(file.dataStart, file.dataStart + file.size);
+      const file = this.iso.getFile(filename);
 
       this.files.push(
-        new GPMFile(filename, fileData, new BinModule(filename, fileData))
+        new GPMFile(filename, file, new BinModule(filename, file))
       );
     }
   }
