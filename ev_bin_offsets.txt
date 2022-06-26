@@ -1,9 +1,0 @@
-GunparadeMarch.Bin offsets:
-
-14DC6A08 - Start of evdata.bin
-150A6338 - Start of ev1061
-(EVData EV1061 start - 2623488)
-
-0x0c == start ending to next char
-
-e.g. 0x0c 0x01 = set ending to 0x01

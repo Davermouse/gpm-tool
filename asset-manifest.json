@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/gpm-tool/static/css/main.bde2b259.css",
+    "main.js": "/gpm-tool/static/js/main.9b1c3218.js",
+    "static/js/787.ca25d330.chunk.js": "/gpm-tool/static/js/787.ca25d330.chunk.js",
+    "index.html": "/gpm-tool/index.html",
+    "main.bde2b259.css.map": "/gpm-tool/static/css/main.bde2b259.css.map",
+    "main.9b1c3218.js.map": "/gpm-tool/static/js/main.9b1c3218.js.map",
+    "787.ca25d330.chunk.js.map": "/gpm-tool/static/js/787.ca25d330.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.bde2b259.css",
+    "static/js/main.9b1c3218.js"
+  ]
+}
