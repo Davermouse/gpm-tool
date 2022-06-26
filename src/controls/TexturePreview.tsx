@@ -74,7 +74,7 @@ export const TexturePreview = observer<
       if (i !== -1) {
         setSelectedSizeIndex(i.toString());
       } else {
-        setSelectedSizeIndex(Math.floor(validSizes.length / 2).toString());
+        setSelectedSizeIndex(Math.ceil(validSizes.length / 2).toString());
       }
     }
   }, [texture]);

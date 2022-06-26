@@ -4,6 +4,8 @@ import { useDropzone } from "react-dropzone";
 import { Buffer } from "buffer";
 import { useGPMToolContext } from "../context/GPMToolContext";
 
+import styles from './Upload.module.css';
+
 export const Upload = () => {
   const { fileStore } = useGPMToolContext();
 
@@ -20,16 +22,13 @@ export const Upload = () => {
 
   const {
     getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-    isDragReject,
+    getInputProps
   } = useDropzone({ onDrop, accept: [".bin"] });
 
   const area = (
-    <div {...getRootProps()}>
+    <div className={styles.uploadArea} {...getRootProps()}>
       <input {...getInputProps()} />
-      <p>Drag 'n' drop your .BIN file here, or click to open a file picker.</p>
+      <p>Drag and drop your .BIN file here, or click to open a file picker.</p>
     </div>
   );
 

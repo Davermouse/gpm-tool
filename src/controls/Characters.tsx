@@ -42,6 +42,13 @@ export const Character: React.FC<{ characterId: number }> = ({
 };
 
 export const Characters = () => {
+  const { fileStore } = useGPMToolContext();
+  const loaded = fileStore && fileStore.evFile !== null;
+
+  if (!loaded) {
+    return <p>Please load a game image to view character art.</p>
+  }
+
   const charcount = 60;
   const characters = [];
 
@@ -49,5 +56,8 @@ export const Characters = () => {
     characters.push(<Character characterId={c} />);
   }
 
-  return <>{characters}</>;
+  return <>
+    <p>All the event character images in the game, sorted by character ID.</p>
+    {characters}
+  </>;
 };

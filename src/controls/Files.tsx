@@ -40,5 +40,8 @@ export const Files = observer(() => {
     return <>Image not loaded</>;
   }
 
-  return <DirList dir={fileStore.iso.header.rootDirRecord} />;
+  return <>
+    <p>A raw list of files loaded from the BIN image.</p>
+    <DirList dir={fileStore.iso.header.rootDirRecord} />
+  </>;
 });

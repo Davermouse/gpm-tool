@@ -62,6 +62,8 @@ const StringEntry = ({ evString }: { evString: EvString }) => {
 };
 
 const TalkCommandEntry = ({ talkCommand }: { talkCommand: TalkCommand }) => {
+  const currentPlayer = talkCommand.params[0] === 0 && talkCommand.params[1] === 0;
+
   return (
     <Accordion>
       <AccordionSummary>
@@ -73,7 +75,8 @@ const TalkCommandEntry = ({ talkCommand }: { talkCommand: TalkCommand }) => {
         )
       </AccordionSummary>
       <AccordionDetails>
-        <EvTexturePreview moduleId={talkCommand.getTextureId()} />
+        { currentPlayer && <p>The current player/narrator</p>} 
+        { !currentPlayer && <EvTexturePreview moduleId={talkCommand.getTextureId()} /> }
       </AccordionDetails>
     </Accordion>
   );
@@ -105,13 +108,13 @@ const UnknownCommandEntry = ({
   const cmdData = cmd_to_string(unknownCommand.cmd);
 
   return (
-    <Accordion>
+    <Accordion >
       <AccordionSummary>
         <Label command={unknownCommand} />
         {cmdData.title}(
         {unknownCommand.params.map((p) => `0x${p.toString(16)}`).join(",")})
       </AccordionSummary>
-      <AccordionDetails>asdsad</AccordionDetails>
+      <AccordionDetails></AccordionDetails>
     </Accordion>
   );
 };
@@ -127,7 +130,6 @@ export const EventPreview = ({ module }: { module: EvModule }) => {
 
   return (
     <div>
-      <h2>Event preview</h2>
       <div>
         <table>
           <thead>

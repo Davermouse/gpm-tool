@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { HashRouter as Router, Switch, Route, Link } from "react-router-dom";
 
 import "./App.css";
 import { useGPMToolContext } from "./context/GPMToolContext";
@@ -10,7 +10,6 @@ import { ModuleTextureBrowser } from "./controls/ModuleTextureBrowser";
 import CssBaseline from "@material-ui/core/CssBaseline";
 
 import Drawer from "@material-ui/core/Drawer";
-import Box from "@material-ui/core/Box";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import List from "@material-ui/core/List";
@@ -25,7 +24,6 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import NotificationsIcon from "@material-ui/icons/Notifications";
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import { makeStyles } from "@material-ui/core";
 import clsx from "clsx";
@@ -34,6 +32,7 @@ import { Publish as PublishIcon } from "@material-ui/icons";
 import { Publish } from "./controls/Publish";
 import { Upload } from "./controls/Upload";
 import { Files } from "./controls/Files";
+import { Home } from "./pages/Home";
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -186,7 +185,7 @@ function App() {
                 <ListItemIcon>
                   <DashboardIcon />
                 </ListItemIcon>
-                <ListItemText primary="Dashboard" />
+                <ListItemText primary="Home" />
               </ListItem>
             </Link>
             <Link to="/events">
@@ -240,6 +239,7 @@ function App() {
                 <Grid container spacing={3}>
                   <Grid item xs={12}>
                     <Paper className={classes.paper}>
+                      <Title>Events</Title>
                       <EVDataEvents />
                     </Paper>
                   </Grid>
@@ -280,8 +280,8 @@ function App() {
               <Route path="/">
                 <Grid item xs={12}>
                   <Paper className={classes.paper}>
-                    <Title>Dashboard</Title>
-                    <Upload />
+                    <Title>Home</Title>
+                    <Home />
                   </Paper>
                 </Grid>
               </Route>

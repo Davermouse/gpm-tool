@@ -2,14 +2,15 @@ import { observer } from "mobx-react";
 import React, { useState } from "react";
 import { useGPMToolContext } from "../context/GPMToolContext";
 import { Texture } from "../gpm-lib/BinModule";
+import { formatHex } from "../helpers";
 import { TexturePreview, TextureType } from "./TexturePreview";
 
 export const ModuleTextureBrowser = observer(() => {
   const { fileStore } = useGPMToolContext();
-  const [textureId, setTextureId] = useState(0);
-  const [fileName, setFileName] = useState("");
+  const [textureId, setTextureId] = useState(0xf);
+  const [fileName, setFileName] = useState("/OTHER/TITLEV.BIN;1");
 
-  if (!fileStore) {
+  if (!fileStore || !fileStore.evFile) {
     return <>Filestore not found</>;
   }
 
@@ -30,26 +31,27 @@ export const ModuleTextureBrowser = observer(() => {
   let textureIds: string[] = [];
 
   if (file) {
-    for (let i = 0; i < file.module.entries; i++) {
-      textureIds.push(i.toString(16));
+    for (let i = 1; i < file.module.entries; i++) {
+      textureIds.push(formatHex(i));
     }
   }
 
   return (
     <div>
+      <p>Browse textures loaded from game modules. These are identified by two bytes - the module id and then the index in that module. </p>
       <select value={fileName} onChange={(e) => setFileName(e.target.value)}>
         {fileStore.files
           .filter((f) => f.module)
           .sort((f) => f.module.module_num)
           .map((f) => (
             <option value={f.name}>
-              {f.module.module_num.toString(16)} - {f.name}
+              {formatHex(f.module.module_num)} - {f.name}
             </option>
           ))}
       </select>
 
       <select
-        value={textureId.toString(16)}
+        value={formatHex(textureId)}
         onChange={(e) => setTextureId(parseInt(e.currentTarget.value, 16))}
       >
         {textureIds.map((id) => (
