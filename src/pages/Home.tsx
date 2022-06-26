@@ -23,6 +23,10 @@ export const Home = observer(() => {
 
             <p>Although you are required to use your browser's upload UI to open the .BIN file, no data from this tool will ever leave your machine, and no data from the game is included with this tool.</p>
 
+            <p>Full source for this tool is available at <a href="https://github.com/Davermouse/gpm-tool">https://github.com/Davermouse/gpm-tool</a>.</p>
+
+            <p>If you have an comments of feedback please make an issue on Github, or send me a message at <a href="https://twitter.com/davidmilesuk">@davidmilesuk</a> or <a href="mailto:me@davidmiles.dev">me@davidmiles.dev</a>.</p>
+
             <p>To get started, please use the control below to load a valid .BIN file for the game. This should be a approximately ~440MB </p>
 
             { !loaded && <Upload /> }
