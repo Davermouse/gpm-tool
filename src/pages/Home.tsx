@@ -8,7 +8,7 @@ export const Home = observer(() => {
 
     return (
         <>
-            <p>Welcome to a very early version of gpm-tool. This tool can currently open a <a href="https://en.wikipedia.org/wiki/Gunparade_March">GunParade March</a> BIN file, and allows you to:</p>
+            <p>Welcome to a very early version of gpm-tool. This tool can currently open a <a href="https://en.wikipedia.org/wiki/Gunparade_March">Gunparade March</a> BIN file, and allows you to:</p>
 
             <ul>
                 <li>View the script for story events in the game</li>

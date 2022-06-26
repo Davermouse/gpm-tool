@@ -2,7 +2,7 @@
 
 ![The Gunparade logo in GPM Tool](images/logo.png)
 
-Welcome to a very early version of gpm-tool. This tool can currently open a [GunParade March](https://en.wikipedia.org/wiki/Gunparade_March) BIN file, and allows you to:
+Welcome to a very early version of gpm-tool. This tool can currently open a [Gunparade March](https://en.wikipedia.org/wiki/Gunparade_March) BIN file, and allows you to:
 
 - View the script for story events in the game
 - Browse raw textures
