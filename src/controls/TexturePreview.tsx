@@ -1,7 +1,6 @@
 import { observer } from "mobx-react";
 import React, { useEffect, useRef, useState } from "react";
 import { Texture } from "../gpm-lib/BinModule";
-import { read_short } from "../gpm-lib/helpers";
 
 export enum TextureType {
   FullColor,
@@ -100,29 +99,18 @@ export const TexturePreview = observer<
 
     const activeClut = clut || greyClut;
 
-    const clutImageData: ImageData[] = [];
+    const clutStyles: string[] = [];
 
     if (type === TextureType.EightBitClut) {
       for (let i = 0; i < 256; i++) {
         const pixel = activeClut[i];
-        const p = context.createImageData(scale, scale);
-        const pixelData = p.data;
 
         const r = pixel & 0b0000000000011111;
         const g = (pixel & 0b0000001111100000) >>> 5;
         const b = (pixel & 0b0111110000000000) >>> 10;
         const t = (pixel & 0b1000000000000000) !== 0;
 
-        if (!t) {
-          for (let po = 0; po < scale * scale * 4; po += 4) {
-            pixelData[po] = (r / 0x1f) * 256;
-            pixelData[po + 1] = (g / 0x1f) * 256;
-            pixelData[po + 2] = (b / 0x1f) * 256;
-            pixelData[po + 3] = t ? 0 : 256;
-          }
-        }
-
-        clutImageData.push(p);
+        clutStyles.push(`rgba(${(r / 0x1f) * 256}, ${(g / 0x1f) * 256}, ${(b / 0x1f) * 256}, ${t ? 0 : 255})`);
       }
     }
 
@@ -130,13 +118,8 @@ export const TexturePreview = observer<
       for (let x = 0; x < width; x++) {
         const pixelOffset = y * width + x;
 
-        const pixel = clutImageData[texture.data[pixelOffset]];
-
-        if (pixel === undefined) {
-          continue;
-        }
-
-        context.putImageData(pixel, x * scale, y * scale);
+        context.fillStyle = clutStyles[texture.data[pixelOffset]];
+        context.fillRect(x * scale, y * scale, scale, scale);
       }
     }
   }, [texture, selectedSizeIndex]);
