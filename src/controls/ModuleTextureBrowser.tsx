@@ -44,7 +44,7 @@ export const ModuleTextureBrowser = observer(() => {
           .filter((f) => f.module)
           .sort((f) => f.module.module_num)
           .map((f) => (
-            <option value={f.name}>
+            <option value={f.name} key={f.name}>
               {formatHex(f.module.module_num)} - {f.name}
             </option>
           ))}
