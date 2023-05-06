@@ -14,6 +14,7 @@ import { Publish } from "./controls/Publish";
 import { Upload } from "./controls/Upload";
 import { Files } from "./controls/Files";
 import { Home } from "./pages/Home";
+import { Maps } from "./controls/Maps";
 
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import { AppBar, Container, CssBaseline, Divider, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText, Paper, Toolbar, Typography, createTheme, styled } from "@mui/material";
@@ -144,6 +145,15 @@ const EvDataEventsPage = () => <Grid container spacing={3}>
   </Grid>
 </Grid>;
 
+const MapsPage = () => <Grid container spacing={3}>
+<Grid item xs={12}>
+  <Paper>
+    <Title>Maps</Title>
+    <Maps />
+  </Paper>
+</Grid>
+</Grid>;
+
 const ModuleTexturesPage = () =>  <Grid item xs={12}>
 <Paper>
   <Title>Module texture browser</Title>
@@ -248,6 +258,14 @@ function App() {
                 <ListItemText primary="Events" />
               </ListItem>
             </Link>
+            <Link to="/maps">
+              <ListItem button>
+                <ListItemIcon>
+                  <DashboardIcon />
+                </ListItemIcon>
+                <ListItemText primary="Maps" />
+              </ListItem>
+            </Link>
             <Link to="/characters">
               <ListItem button>
                 <ListItemIcon>
@@ -288,6 +306,7 @@ function App() {
           <Container maxWidth="lg">
             <Routes>
               <Route path="/events" element={<EvDataEventsPage />} />
+              <Route path="/maps" element={<MapsPage />} />
               <Route path="/module_textures" element={<ModuleTexturesPage />} />
               <Route path="/characters" element={<CharactersPage />} />
               <Route path="/files" element={<FilesPage/>} />
