@@ -17,7 +17,7 @@ function coloredClutFromRaw(data: Uint8Array): Uint16Array {
   return new Uint16Array(output);
 }
 
-export const EvTexturePreview = ({ moduleId }: { moduleId: number }) => {
+export const EvTexturePreview = React.memo(({ moduleId }: { moduleId: number }) => {
   const { fileStore } = useGPMToolContext();
 
   if (!fileStore) {
@@ -49,4 +49,4 @@ export const EvTexturePreview = ({ moduleId }: { moduleId: number }) => {
       clut={clut}
     />
   );
-};
+});

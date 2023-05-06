@@ -1,7 +1,3 @@
-import Accordion from "@material-ui/core/Accordion";
-import AccordionSummary from "@material-ui/core/AccordionSummary";
-import AccordionDetails from "@material-ui/core/AccordionDetails";
-
 import { cmd_to_string } from "../gpm-lib/evdata";
 import { BaseCommand } from "../gpm-lib/Events/BaseCommand";
 import { TalkCommand } from "../gpm-lib/Events/Commands/TalkCommand";
@@ -14,6 +10,7 @@ import styles from "./EventPreview.module.css";
 import { EvTexturePreview } from "./EVTexturePreview";
 import { useEffect, useState } from "react";
 import { FaceOnCommand } from "../gpm-lib/Events/Commands/FaceOnCommand";
+import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 
 const elementFromCommand = (index: number, command: BaseCommand) => {
   if (command instanceof EvString) {

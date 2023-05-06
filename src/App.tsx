@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { HashRouter as Router, Switch, Route, Link } from "react-router-dom";
+import React, { ReactNode, useEffect } from "react";
+import { HashRouter as Router, Route, Link, Routes } from "react-router-dom";
 
 import "./App.css";
 import { useGPMToolContext } from "./context/GPMToolContext";
@@ -7,35 +7,23 @@ import { GPMFileList } from "./controls/GPMFileList";
 import { TexturePreview } from "./controls/TexturePreview";
 import { EVDataEvents } from "./controls/EVDataEvents";
 import { ModuleTextureBrowser } from "./controls/ModuleTextureBrowser";
-import CssBaseline from "@material-ui/core/CssBaseline";
 
-import Drawer from "@material-ui/core/Drawer";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import List from "@material-ui/core/List";
-import ListItem from "@material-ui/core/ListItem";
-import Typography from "@material-ui/core/Typography";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import Divider from "@material-ui/core/Divider";
-import IconButton from "@material-ui/core/IconButton";
-import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import MenuIcon from "@material-ui/icons/Menu";
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import DashboardIcon from "@material-ui/icons/Dashboard";
-import { makeStyles } from "@material-ui/core";
 import clsx from "clsx";
 import { Characters } from "./controls/Characters";
-import { Publish as PublishIcon } from "@material-ui/icons";
 import { Publish } from "./controls/Publish";
 import { Upload } from "./controls/Upload";
 import { Files } from "./controls/Files";
 import { Home } from "./pages/Home";
 
-const drawerWidth = 240;
-const useStyles = makeStyles((theme) => ({
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import { AppBar, Container, CssBaseline, Divider, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText, Paper, Toolbar, Typography, createTheme, styled } from "@mui/material";
+import MuiDrawer from '@mui/material/Drawer';
+import { Menu } from "@mui/icons-material";
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import PublishIcon from '@mui/icons-material/Publish';
+
+/*const drawerWidth = 240;
+const useStyles = createTheme({
   root: {
     display: "flex",
   },
@@ -109,9 +97,37 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexDirection: "column",
   },
-}));
+});*/
 
-const Title: React.FC<{}> = ({ children }) => {
+const drawerWidth: number = 240;
+
+const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open }) => ({
+    '& .MuiDrawer-paper': {
+      position: 'relative',
+      whiteSpace: 'nowrap',
+      width: drawerWidth,
+      transition: theme.transitions.create('width', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+      boxSizing: 'border-box',
+      ...(!open && {
+        overflowX: 'hidden',
+        transition: theme.transitions.create('width', {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.leavingScreen,
+        }),
+        width: theme.spacing(7),
+        [theme.breakpoints.up('sm')]: {
+          width: theme.spacing(9),
+        },
+      }),
+    },
+  }),
+);
+
+const Title = ({ children }: { children: ReactNode }) => {
   return (
     <Typography component="h2" variant="h6" color="primary" gutterBottom>
       {children}
@@ -119,8 +135,52 @@ const Title: React.FC<{}> = ({ children }) => {
   );
 };
 
+const EvDataEventsPage = () => <Grid container spacing={3}>
+  <Grid item xs={12}>
+    <Paper>
+      <Title>Events</Title>
+      <EVDataEvents />
+    </Paper>
+  </Grid>
+</Grid>;
+
+const ModuleTexturesPage = () =>  <Grid item xs={12}>
+<Paper>
+  <Title>Module texture browser</Title>
+  <ModuleTextureBrowser />
+</Paper>
+</Grid>;
+
+const CharactersPage = () => <Grid item xs={12}>
+<Paper>
+  <Title>Characters</Title>
+  <Characters />
+</Paper>
+</Grid>;
+
+const FilesPage = () => <Grid item xs={12}>
+<Paper>
+  <Title>Files</Title>
+  <Files />
+</Paper>
+</Grid>;
+
+const PublishPage = () => <Grid item xs={12}>
+<Paper>
+  <Title>Publish</Title>
+  <Publish />
+</Paper>
+</Grid>;
+
+const HomePage = () => <Grid item xs={12}>
+<Paper>
+  <Title>Home</Title>
+  <Home />
+</Paper>
+</Grid>;
+
 function App() {
-  const classes = useStyles();
+  //const classes = useStyles();
   const [open, setOpen] = React.useState(true);
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -140,26 +200,21 @@ function App() {
     <Router>
       <div className="App">
         <CssBaseline />
-        <AppBar className={classes.appBar}>
-          <Toolbar className={classes.toolbar}>
+        <AppBar>
+          <Toolbar>
             <IconButton
               edge="start"
               color="inherit"
               aria-label="open drawer"
               onClick={handleDrawerOpen}
-              className={clsx(
-                classes.menuButton,
-                open && classes.menuButtonHidden
-              )}
             >
-              <MenuIcon />
+              <Menu />
             </IconButton>
             <Typography
               component="h1"
               variant="h6"
               color="inherit"
               noWrap
-              className={classes.title}
             >
               GPM Tool
             </Typography>
@@ -168,12 +223,9 @@ function App() {
         </AppBar>
         <Drawer
           variant="permanent"
-          classes={{
-            paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
-          }}
           open={open}
         >
-          <div className={classes.toolbarIcon}>
+          <div>
             <IconButton onClick={handleDrawerClose}>
               <ChevronLeftIcon />
             </IconButton>
@@ -231,61 +283,17 @@ function App() {
           </List>
           <Divider />
         </Drawer>
-        <main className={classes.content}>
-          <div className={classes.appBarSpacer} />
-          <Container maxWidth="lg" className={classes.container}>
-            <Switch>
-              <Route path="/events">
-                <Grid container spacing={3}>
-                  <Grid item xs={12}>
-                    <Paper className={classes.paper}>
-                      <Title>Events</Title>
-                      <EVDataEvents />
-                    </Paper>
-                  </Grid>
-                </Grid>
-              </Route>
-              <Route path="/module_textures">
-                <Grid item xs={12}>
-                  <Paper className={classes.paper}>
-                    <Title>Module texture browser</Title>
-                    <ModuleTextureBrowser />
-                  </Paper>
-                </Grid>
-              </Route>
-              <Route path="/characters">
-                <Grid item xs={12}>
-                  <Paper className={classes.paper}>
-                    <Title>Characters</Title>
-                    <Characters />
-                  </Paper>
-                </Grid>
-              </Route>
-              <Route path="/files">
-                <Grid item xs={12}>
-                  <Paper className={classes.paper}>
-                    <Title>Files</Title>
-                    <Files />
-                  </Paper>
-                </Grid>
-              </Route>
-              <Route path="/publish">
-                <Grid item xs={12}>
-                  <Paper className={classes.paper}>
-                    <Title>Publish</Title>
-                    <Publish />
-                  </Paper>
-                </Grid>
-              </Route>
-              <Route path="/">
-                <Grid item xs={12}>
-                  <Paper className={classes.paper}>
-                    <Title>Home</Title>
-                    <Home />
-                  </Paper>
-                </Grid>
-              </Route>
-            </Switch>
+        <main>
+          <div/>
+          <Container maxWidth="lg">
+            <Routes>
+              <Route path="/events" element={<EvDataEventsPage />} />
+              <Route path="/module_textures" element={<ModuleTexturesPage />} />
+              <Route path="/characters" element={<CharactersPage />} />
+              <Route path="/files" element={<FilesPage/>} />
+              <Route path="/publish" element={<PublishPage />} />
+              <Route path="/" element={<HomePage />} />
+            </Routes>
           </Container>
         </main>
       </div>
