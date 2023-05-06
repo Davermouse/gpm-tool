@@ -6,6 +6,8 @@ import { BinModule, Texture } from "../gpm-lib/BinModule";
 import { EvFile } from "../gpm-lib/EvFile";
 import { GPMISO } from "../gpm-lib/GpmIso";
 import { IsoFile } from "../gpm-lib/IsoReader";
+import { Executable } from "../gpm-lib/Executable";
+import { MapDataFile } from "../gpm-lib/MapData";
 
 class GPMFile {
   constructor(
@@ -22,6 +24,9 @@ export class FileStore {
   public evFile: EvFile | null = null;
   private rawIso: Buffer | null = null;
   public iso: IsoFile | null = null;
+
+  public executable: Executable | null = null;
+  public mapData: MapDataFile | null = null;
 
   constructor() {
     makeAutoObservable(this);
@@ -65,6 +70,9 @@ export class FileStore {
       this.files = iso.files.sort(
         (a, b) => a.module.module_num - b.module.module_num
       );
+
+      this.executable = new Executable(iso);
+      this.mapData = new MapDataFile(iso, this.executable);
     });
   }
 

@@ -33,6 +33,7 @@ import { Publish } from "./controls/Publish";
 import { Upload } from "./controls/Upload";
 import { Files } from "./controls/Files";
 import { Home } from "./pages/Home";
+import { Maps } from "./controls/Maps";
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
@@ -196,6 +197,14 @@ function App() {
                 <ListItemText primary="Events" />
               </ListItem>
             </Link>
+            <Link to="/maps">
+              <ListItem button>
+                <ListItemIcon>
+                  <DashboardIcon />
+                </ListItemIcon>
+                <ListItemText primary="Maps" />
+              </ListItem>
+            </Link>
             <Link to="/characters">
               <ListItem button>
                 <ListItemIcon>
@@ -241,6 +250,16 @@ function App() {
                     <Paper className={classes.paper}>
                       <Title>Events</Title>
                       <EVDataEvents />
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </Route>
+              <Route path="/maps">
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <Paper className={classes.paper}>
+                      <Title>Maps</Title>
+                      <Maps />
                     </Paper>
                   </Grid>
                 </Grid>
