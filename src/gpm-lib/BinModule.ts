@@ -32,7 +32,7 @@ export class BinModule {
     const module_id = id >>> 8;
 
     if (this.module_num !== module_id) {
-      console.error("Unknown module");
+      console.error(`Unknown module, tried to load ${module_id.toString(16)} from ${this.module_num.toString(16)}`);
     }
 
     /*  uVar2 = mod_num + (uint)(byte)plVar1->mod_num * -0x100 & 0xffff;
@@ -76,7 +76,7 @@ export class BinModule {
     const texture = {
       w,
       h,
-      data,
+      data: data.data,
     };
 
     this.textureCache[id] = texture;

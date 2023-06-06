@@ -32,6 +32,8 @@ const fileContent = fs.readFileSync(TEXTURE_PATH);
 //    evfileid = 0x538
 */
 
+import { read_short } from "./helpers";
+
 // first faceload(intro)
 // do_faceload(modnum = 4. p2 = 4)
 
@@ -313,5 +315,37 @@ export function decompress_texture(buffer: Uint8Array, offset: number) {
     }
   }
   // return bytes_written;
-  return new Uint8Array(output);
+  return {
+    bytes_read: _place_in_texture_data,
+    data: new Uint8Array(output),
+  };
+}
+
+export function decompress_sized_texture(w: number, h: number, buffer: Uint8Array, offset: number): Uint8Array {
+  const data_to_load = w * h * 2;
+  const output = new Uint8Array(data_to_load);
+  let data_loaded = 0;
+
+  while (data_loaded < data_to_load) {
+    const decompressed = decompress_texture(buffer, offset);
+
+    output.set(decompressed.data, data_loaded);
+    offset += decompressed.bytes_read;
+
+    data_loaded += decompressed.data.length;
+  }
+
+  return output;
+}
+
+export function coloredClutFromRaw(data: Uint8Array): Uint16Array {
+  if (data.length !== 512) throw new Error("Unexpected data length");
+
+  const output = [];
+
+  for (let i = 0; i < 256; i++) {
+    output.push(read_short(data, i * 2));
+  }
+
+  return new Uint16Array(output);
 }

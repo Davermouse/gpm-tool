@@ -210,27 +210,7 @@ function App() {
     <Router>
       <div className="App">
         <CssBaseline />
-        <AppBar>
-          <Toolbar>
-            <IconButton
-              edge="start"
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-            >
-              <Menu />
-            </IconButton>
-            <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-            >
-              GPM Tool
-            </Typography>
-            <IconButton color="inherit"></IconButton>
-          </Toolbar>
-        </AppBar>
+       
         <Drawer
           variant="permanent"
           open={open}

@@ -2,14 +2,40 @@ import { Texture } from "./BinModule";
 import { Executable } from "./Executable";
 import { GPMISO } from "./GpmIso";
 import { read_int, read_short } from "./helpers";
-import { decompress_texture } from "./texture";
+import { decompress_texture, decompress_sized_texture } from "./texture";
 
 const MAPDATA_FILE = "/map/MAPDATA.bin;1";
 
+class MapSpritePrim {
+  constructor(private data: Uint8Array) {
+
+  }
+}
+
+class MapSpriteData {
+  private num_prims: number;
+
+  public sprites: MapSpritePrim[];
+
+  constructor(private data: Uint8Array) {
+    this.num_prims = read_short(data, 26);
+
+    this.sprites = [];
+
+    for (let i = 0 ; i < this.num_prims ; i++) {
+      this.sprites.push(
+        new MapSpritePrim(data.slice(
+          36 + i * 36
+        ))
+      );
+    }
+  }
+}
+
 export class MapData {
-  public chunk1: Texture;
-  public chunk2: Texture;
-  public chunk3: Texture;
+  public map_tex: Texture;
+  public map_clut : Uint8Array;
+  public chunk3: MapSpriteData;
   public chunk4: Texture;
   public chunk5: Texture;
 
@@ -22,51 +48,48 @@ export class MapData {
 
     console.debug(`Map chunk 1 offset: ${chunk1Offset}`);
 
-    this.chunk1 = {
-      w: read_short(data, chunk1Offset),
-      h: read_short(data, chunk1Offset + 2),
-      data: decompress_texture(data, chunk1Offset + 8),
+    this.map_tex = {
+      w: read_short(data, chunk1Offset), //508
+      h: read_short(data, chunk1Offset + 2) & 0x3fff, //256
+      data: new Uint8Array()
     };
+
+    this.map_tex.data = decompress_sized_texture(
+      this.map_tex.w,
+      this.map_tex.h,
+      data, chunk1Offset + 8
+    );
 
     const chunk2Offset = read_int(data, 8);
-    const packedDims = 0x7800; // read_int(data, chunk2Offset);
-
-    const chunk2Width = (packedDims & 0x3f) << 4;
-    const chunk2Height = (packedDims & 0xffff) >> 6;
-    this.chunk2 = {
-      w: chunk2Width,
-      h: chunk2Height,
-      data: data.slice(
-        chunk2Offset + 4,
-        chunk2Offset + 4 + chunk2Width * chunk2Height
-      ),
-    };
+    
+    this.map_clut = data.slice(
+      chunk2Offset + 4,
+      chunk2Offset + 4 + 512
+    );
 
     const chunk3Offset = read_int(data, 12);
-    this.chunk3 = {
-      w: 0,
-      h: 0,
-      data: decompress_texture(data, chunk3Offset + 4),
-    };
+    const chunk3Data = decompress_texture(data, chunk3Offset + 4);
+    this.chunk3 = new MapSpriteData(chunk3Data.data);
 
     console.log(
       `Chunk 3 stored size: ${read_int(data, chunk3Offset)} actual size: ${
-        this.chunk3.data.byteLength
+        chunk3Data.data.byteLength
       }`
     );
+    console.log(`Chunk 3 has ${this.chunk3.sprites.length} sprites`)
 
     const chunk4Offset = read_int(data, 16);
     this.chunk4 = {
       w: 0,
       h: 0,
-      data: decompress_texture(data, chunk4Offset + 4),
+      data: decompress_texture(data, chunk4Offset + 4).data,
     };
 
     const chunk5Offset = read_int(data, 20);
     this.chunk5 = {
       w: 0,
       h: 0,
-      data: decompress_texture(data, chunk5Offset + 4),
+      data: decompress_texture(data, chunk5Offset + 4).data,
     };
   }
 }

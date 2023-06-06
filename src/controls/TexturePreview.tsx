@@ -42,7 +42,7 @@ export const TexturePreview = observer<
   }>
 >(({ texture, type, clut, scale }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const canvasWidth = 325 * scale;
+  const canvasWidth = 1020 * scale;
   const canvasHeight = 250 * scale;
 
   const validSizes: {
@@ -67,7 +67,7 @@ export const TexturePreview = observer<
   useEffect(() => {
     if (texture) {
       const i = validSizes.findIndex(
-        (vs) => vs.h === texture.h && vs.w === texture.w
+        (vs) => vs.h === texture.h && vs.w === texture.w * 2
       );
 
       if (i !== -1) {
