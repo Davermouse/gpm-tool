@@ -19,14 +19,14 @@ export class Executable {
     // 4bf000  = 4976640
     //  22000
     getMapData(mapId: number, mapSubPart: number, mapSubSubPart: number) {
-        const mapIndex = (mapId * 5) + mapSubSubPart;
+        let mapIndex = (mapId * 5) + mapSubSubPart;
 
         if (mapSubPart != 0) {
-            mapId += 3;
+            mapIndex += 3;
         }
 
         if (mapSubSubPart === 2 && mapSubPart !== 0) {
-            mapId -= 1;
+            mapIndex -= 1;
         }
 
         const offsetOffset = MAP_DATA_OFFSET + (mapIndex + 1 - 5) * 4 - 1 + 1;
