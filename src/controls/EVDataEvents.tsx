@@ -1,7 +1,7 @@
 import { observer } from "mobx-react";
 import { useState } from "react";
 import { useGPMToolContext } from "../context/GPMToolContext";
-import { EvModule, EvModuleType } from "../gpm-lib/EvFile";
+import { EVFILE, EvModule, EvModuleType } from "../gpm-lib/EvFile";
 import { EventPreview } from "./EventPreview";
 import { EvTexturePreview } from "./EVTexturePreview";
 
@@ -41,7 +41,7 @@ export const EVDataEvents = observer(() => {
         onChange={(e) => setCurrentOffset(parseInt(e.currentTarget.value))}
       />
       </label>
-      <button onClick={() => fileStore.evFile?.updateISO()}>
+      <button onClick={() => fileStore.evFile && fileStore.iso?.replaceFile(EVFILE, Buffer.from(fileStore.evFile.data))}>
         Save EV file
       </button>
       {module && module.type == EvModuleType.Texture && (

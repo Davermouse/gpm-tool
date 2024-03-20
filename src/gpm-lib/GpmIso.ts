@@ -1,43 +1,43 @@
 import { BinModule } from "./BinModule";
-import { EvFile } from "./EvFile";
+import { EVFILE, EvFile } from "./EvFile";
 import { IsoFile } from "./IsoReader";
 
-const MODULE_FILES = [
-  //"/CTDATA/TIMEJOB.BIN;1",
-  "/OTHER/GAMEOVER.BIN;1",
-  "/OTHER/TITLEV.BIN;1",
-  //"/OTHER/ICONDATA.BIN;1",
-  "/OTHER/MAPPOS.BIN;1",
-  "/OTHER/OPENING.BIN;1",
-  "/OTHER/TURN.BIN;1",
-  "/OTHER/TURNS.BIN;1",
-  "/DATA/TEXTURE.BIN;1",
-  "/DATA/AROUND.BIN;1",
-  "/FACE/FACES.BIN;1",
-  "/FACE/FACEM.BIN;1",
-  "/FACE/DATACM.BIN;1",
-  "/DATA/STWINDOW.BIN;1",
-  "/DATA/MAINT.BIN;1",
-  "/FONT/FONTDATA.BIN;1",
-  "/DATA/MMAP.BIN;1",
-  "/DATA/GP_EFF.BIN;1",
-  "/MAP/MAPDATA.BIN;1",
-  "/MAP/MAPNAME.BIN;1",
-  //"/MAP/YA.BIN;1",
-  "/DATA/HUN.BIN;1",
-  "/DATA/MEETING.BIN;1",
-  "/DATA/MENU.BIN;1",
-  "/DATA/MENU_DRI.BIN;1",
-  "/DATA/MENU_JOB.BIN;1",
-  "/DATA/MENU_TSR.BIN;1",
-  "/DATA/MEMCARD.BIN;1",
-  "/DATA/CALENDAR.BIN;1",
-  "/DATA/ETCETERA.BIN;1",
-  "/DATA/FREEALL.BIN;1",
-  "/DATA/FZDATAS.BIN;1",
-  "/DATA/FZLIGHT.BIN;1",
-  "/DATA/TIMEFONT.BIN;1",
-  "/BATTLE/BTLSTAT.BIN;1",
+export const MODULE_FILES = [
+  //"/CTDATA/TIMEJOB.BIN",
+  "/OTHER/GAMEOVER.BIN",
+  "/OTHER/TITLEV.BIN",
+  //"/OTHER/ICONDATA.BIN",
+  "/OTHER/MAPPOS.BIN",
+  "/OTHER/OPENING.BIN",
+  "/OTHER/TURN.BIN",
+  "/OTHER/TURNS.BIN",
+  "/DATA/TEXTURE.BIN",
+  "/DATA/AROUND.BIN",
+  "/FACE/FACES.BIN",
+  "/FACE/FACEM.BIN",
+  "/FACE/DATACM.BIN",
+  "/DATA/STWINDOW.BIN",
+  "/DATA/MAINT.BIN",
+  "/FONT/FONTDATA.BIN",
+  "/DATA/MMAP.BIN",
+  "/DATA/GP_EFF.BIN",
+  "/MAP/MAPDATA.BIN",
+  "/MAP/MAPNAME.BIN",
+  //"/MAP/YA.BIN",
+  "/DATA/HUN.BIN",
+  "/DATA/MEETING.BIN",
+  "/DATA/MENU.BIN",
+  "/DATA/MENU_DRI.BIN",
+  "/DATA/MENU_JOB.BIN",
+  "/DATA/MENU_TSR.BIN",
+  "/DATA/MEMCARD.BIN",
+  "/DATA/CALENDAR.BIN",
+  "/DATA/ETCETERA.BIN",
+  "/DATA/FREEALL.BIN",
+  "/DATA/FZDATAS.BIN",
+  "/DATA/FZLIGHT.BIN",
+  "/DATA/TIMEFONT.BIN",
+  "/BATTLE/BTLSTAT.BIN",
 ];
 
 class GPMFile {
@@ -62,7 +62,7 @@ export class GPMISO {
       );
     }
 
-    this.evData = new EvFile(this);
+    this.evData = new EvFile(this.iso.getFile(EVFILE));
 
     for (let filename of MODULE_FILES) {
       const file = this.iso.getFile(filename);

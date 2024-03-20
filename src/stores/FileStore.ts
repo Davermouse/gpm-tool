@@ -8,6 +8,7 @@ import { GPMISO } from "../gpm-lib/GpmIso";
 import { IsoFile } from "../gpm-lib/IsoReader";
 import { Executable } from "../gpm-lib/Executable";
 import { MapDataFile } from "../gpm-lib/MapData";
+import { FuurakiImage } from "../gpm-lib/FuurakiImage";
 
 class GPMFile {
   constructor(
@@ -58,22 +59,30 @@ export class FileStore {
   }
 
   public async loadBinData(buffer: Buffer) {
-    //const file = new IsoFile(Buffer.from(buffer));
+    const file = new IsoFile(Buffer.from(buffer));
 
-    const iso = new GPMISO(Buffer.from(buffer));
+    if (file.header?.volumeId === "GUNPARADEMARCH") {
+      const iso = new GPMISO(Buffer.from(buffer));
 
-    runInAction(() => {
-      console.log("Setting evFile");
+      runInAction(() => {
+        console.log("Setting evFile");
+  
+        this.iso = iso.iso;
+        this.evFile = iso.evData;
+        this.files = iso.files.sort(
+          (a, b) => a.module.module_num - b.module.module_num
+        );
+  
+        this.executable = new Executable(iso);
+        this.mapData = new MapDataFile(iso, this.executable);
+      });
+    } else if (file.header?.volumeId === 'SLPS-03094') {
+      console.info("Loading Fuuraki")
 
-      this.iso = iso.iso;
-      this.evFile = iso.evData;
-      this.files = iso.files.sort(
-        (a, b) => a.module.module_num - b.module.module_num
-      );
-
-      this.executable = new Executable(iso);
-      this.mapData = new MapDataFile(iso, this.executable);
-    });
+      const image = new FuurakiImage(file);
+    } else {
+      console.info(file.header?.volumeId)
+    }
   }
 
   public publishIso(): string {

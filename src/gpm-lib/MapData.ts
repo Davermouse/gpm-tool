@@ -4,7 +4,7 @@ import { GPMISO } from "./GpmIso";
 import { read_int, read_short } from "./helpers";
 import { decompress_texture, decompress_sized_texture } from "./texture";
 
-const MAPDATA_FILE = "/map/MAPDATA.bin;1";
+const MAPDATA_FILE = "/map/MAPDATA.bin";
 
 class MapSpritePrim {
   constructor(private data: Uint8Array) {

@@ -1,6 +1,6 @@
 import React from "react";
 import { useGPMToolContext } from "../context/GPMToolContext";
-import { EvModule, EvModuleType } from "../gpm-lib/EvFile";
+import { EvModuleType } from "../gpm-lib/EvFile";
 import { decompress_texture, coloredClutFromRaw } from "../gpm-lib/texture";
 import { TexturePreview, TextureType } from "./TexturePreview";
 
@@ -21,12 +21,18 @@ export const EvTexturePreview = React.memo(({ moduleId }: { moduleId: number }) 
     return <span>{`EV Module ${moduleId} not found`}</span>;
   }
 
+  const h = module.data[1];
+
+  console.log(`ModuleID: ${moduleId} h ${h}`)
   const clut = coloredClutFromRaw(module.data.slice(0 + 4, 512 + 4));
+  const data = decompress_texture(module.data.slice(0x212 + 4), 0).data;
   const evTexture = {
-    w: 0,
-    h: 0,
-    data: decompress_texture(module.data.slice(0x212 + 4), 0).data,
+    w: data.length / h / 2,
+    h,
+    data,
   };
+
+  console.log(`Dimensions: ${data.length / h} x ${h}`);
 
   return (
     <TexturePreview

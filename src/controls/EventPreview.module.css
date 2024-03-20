@@ -5,3 +5,20 @@
 .label {
   width: 50px;
 }
+
+.commandEntry {
+  display: flex;
+  border-bottom: 1px solid lightgray;
+}
+
+.commandSummary {
+  
+}
+
+.commandDetails {
+  display: none;
+}
+
+.commandEntryExpanded .commandDetails {
+  display: block;
+}

@@ -2,9 +2,6 @@ import { read_short } from "./helpers";
 
 import { Evdatabin } from "./Evdatabin";
 const shiftjis = require("shiftjis");
-//const KaitaiStream = require("kaitai-struct/KaitaiStream");
-
-//const parsedEVData = new Evdatabin(new KaitaiStream(fileContent));
 
 export function cmd_to_string(cmd: number): { title: string; params?: number } {
   switch (cmd) {

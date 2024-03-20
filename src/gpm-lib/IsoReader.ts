@@ -614,6 +614,8 @@ export class IsoFile {
       throw new Error("Unable to get file before loading header");
     }
 
+    name += ';1';
+
     const parts = name.split("/").filter((e) => e !== "");
 
     let currentEntry = this.header.rootDirRecord;

@@ -10,15 +10,13 @@ export const Upload = () => {
   const { fileStore } = useGPMToolContext();
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    console.log(acceptedFiles);
-
     if (acceptedFiles.length) {
       const f = acceptedFiles[0];
 
       const buf = await f.arrayBuffer();
       fileStore?.loadBinData(Buffer.from(buf));
     }
-  }, []);
+  }, [fileStore]);
 
   const {
     getRootProps,

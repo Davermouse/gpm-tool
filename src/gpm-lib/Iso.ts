@@ -61,7 +61,7 @@ class VolumeDescriptor {
 
   public rootDirectory: DirectoryEntry;
 
-  constructor(private fullBuffer: Buffer, offset: number) {
+  constructor(fullBuffer: Buffer, offset: number) {
     const buffer = fullBuffer.slice(offset, offset + SECTOR_SIZE);
 
     const type = buffer.readInt8(0);
@@ -113,6 +113,8 @@ export class ISO {
   }
 
   public findEntry(path: string) {
+    path += ";1";
+
     const parts = path.split("/").filter((e) => e !== "");
     console.dir(parts);
 

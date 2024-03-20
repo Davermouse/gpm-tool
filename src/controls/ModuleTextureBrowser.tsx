@@ -8,7 +8,7 @@ import { TexturePreview, TextureType } from "./TexturePreview";
 export const ModuleTextureBrowser = observer(() => {
   const { fileStore } = useGPMToolContext();
   const [textureId, setTextureId] = useState(0xf);
-  const [fileName, setFileName] = useState("/OTHER/TITLEV.BIN;1");
+  const [fileName, setFileName] = useState("/OTHER/TITLEV.BIN");
 
   if (!fileStore || !fileStore.evFile) {
     return <>Filestore not found</>;

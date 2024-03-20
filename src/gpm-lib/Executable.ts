@@ -2,7 +2,7 @@ import { GPMISO } from "./GpmIso";
 import { read_int } from "./helpers";
 
 // Mapped to 80010010
-const EXECUTABLE_FILE = "/SCPS_101.36;1"
+const EXECUTABLE_FILE = "/SCPS_101.36"
 
 // Memory address = 80014868
 const MAP_DATA_OFFSET = 0x5080;

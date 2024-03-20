@@ -8,9 +8,10 @@ import { EvModule } from "../gpm-lib/EvFile";
 
 import styles from "./EventPreview.module.css";
 import { EvTexturePreview } from "./EVTexturePreview";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { FaceOnCommand } from "../gpm-lib/Events/Commands/FaceOnCommand";
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
+import classNames from "classnames";
 
 const elementFromCommand = (index: number, command: BaseCommand) => {
   if (command instanceof EvString) {
@@ -37,6 +38,34 @@ const Label = ({ command }: { command: BaseCommand }) => {
   );
 };
 
+const CommandEntry = ({ command, children }: { command: BaseCommand, children: ReactNode }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const c = classNames(
+    styles.commandEntry,
+    {
+      [styles.commandEntryExpanded]: isExpanded
+    }
+  );
+
+  return (
+    <div className={c} onClick={() => setIsExpanded(!isExpanded)}>
+      <Label command={command} />
+      {children}
+    </div>
+  );
+}
+
+const CommandEntrySummary = ({ children }: { children: ReactNode}) =>
+  <div className={styles.commandSummary}>
+    {children}
+  </div>;
+
+const CommandEntryDetails = ({ children }: { children: ReactNode}) =>
+  <div className={styles.commandDetails}>
+    {children}
+  </div>;
+
 const StringEntry = ({ evString }: { evString: EvString }) => {
   const [text, setText] = useState(evString.text);
 
@@ -45,16 +74,15 @@ const StringEntry = ({ evString }: { evString: EvString }) => {
   }, [evString]);
 
   return (
-    <Accordion>
-      <AccordionSummary>
-        <div className={styles.label} />
+    <CommandEntry command={evString}>
+      <CommandEntrySummary>
         {evString.text}
-      </AccordionSummary>
-      <AccordionDetails>
+      </CommandEntrySummary>
+      <CommandEntryDetails>
         <input value={text} onChange={(e) => setText(e.currentTarget.value)} />
         <button onClick={() => (evString.text = text)}>Save</button>
-      </AccordionDetails>
-    </Accordion>
+      </CommandEntryDetails>
+    </CommandEntry>
   );
 };
 

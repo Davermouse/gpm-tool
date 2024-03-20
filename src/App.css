@@ -1,5 +1,5 @@
-.App {
-  display: flex;
+* {
+  box-sizing: border-box;
 }
 
 .App-logo {
@@ -26,6 +26,29 @@
 
 .App-link {
   color: #61dafb;
+}
+
+header {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  height: 80px;
+  background: white;
+}
+
+nav {
+  width: 150px;
+}
+
+nav ul {
+  list-style: none;
+  margin-block-start: 0.25rem;
+  padding-inline-start: 0.25rem;
+}
+
+main {
+  width: 900px;
+  overflow: auto;
 }
 
 @keyframes App-logo-spin {
