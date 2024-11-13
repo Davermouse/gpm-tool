@@ -67,7 +67,7 @@ export const TexturePreview = observer<
   useEffect(() => {
     if (texture) {
       const i = validSizes.findIndex(
-        (vs) => vs.h === texture.h && vs.w === texture.w * 2
+        (vs) => vs.h === texture.h && vs.w === texture.w
       );
 
       if (i !== -1) {

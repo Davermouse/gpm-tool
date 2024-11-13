@@ -1,4 +1,4 @@
-import { serialize_short, write_short } from "../../helpers";
+import { serialize_short } from "../../helpers";
 import { BaseCommand } from "../BaseCommand";
 import { COMMAND_START } from "../GPEvent";
 import { computeTextureId } from "../Helpers/CharacterHelpers";
@@ -11,7 +11,7 @@ export class FaceOnCommand extends BaseCommand {
   ];
 
   constructor(offset: number, public params: number[]) {
-    super(offset);
+    super(offset, 26, params);
   }
 
   public getTextureId() {

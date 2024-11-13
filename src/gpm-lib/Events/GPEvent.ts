@@ -1,3 +1,4 @@
+import { cmd_to_string } from "../evdata";
 import { overwrite_short, read_short, write_short } from "../helpers";
 import { BaseCommand } from "./BaseCommand";
 import { cmd_param_lengths } from "./CmdParamLengths";
@@ -13,6 +14,39 @@ export class GPEvent {
 
   constructor(private data: Uint8Array) {
     this.populateCommands(data);
+  }
+
+  public export(): string {
+    const lines: string[] = [];
+
+    for (const command of this.commands) {
+      if (command instanceof EvString) {
+        lines.push(`Text: ${command.text}`);
+      } else {
+        const label = command.label != null ? `${command.label}: ` : '';
+
+        const cmdInfo = cmd_to_string(command.cmd);
+
+        lines.push(label + cmdInfo.title + (command.params.length ? ' ' + command.params.join(',') : ''));
+      }
+    }
+
+    return lines.join('\n');
+  }
+
+  public import(script: string) {
+    const lines = script.split('\n').map(l => l.trim());
+
+    for (const line of lines) {
+      let label = null
+      const labelMatch = /\d+\:/.exec(line);
+
+      if (labelMatch !== null && labelMatch.length) {
+        label = parseInt(labelMatch[0]);
+      }
+
+      
+    }
   }
 
   public serialize(): Uint8Array {

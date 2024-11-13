@@ -153,8 +153,32 @@ export const EventPreview = ({ module }: { module: EvModule }) => {
     module.replaceData(d);
   };
 
+  const doExport = () => {
+    console.log('Do export');
+
+    const output = event.export();
+    const url = URL.createObjectURL(new Blob([output]));
+
+    const a = document.createElement('a');
+
+    a.href = url;
+    a.download = `script-${module.id}.txt`;
+
+    const clickHandler = () => {
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        a.removeEventListener("click", clickHandler);
+      }, 150);
+    };
+
+    a.addEventListener("click", clickHandler, false);
+
+    a.click();
+  }
+
   return (
     <div>
+      <button onClick={() => doExport()}>Export script</button>
       <div>
         <table>
           <thead>

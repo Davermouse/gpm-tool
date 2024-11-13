@@ -247,8 +247,6 @@ export function decompress_texture(buffer: Uint8Array, offset: number) {
           byte_1 = buffer[offset + _place_in_texture_data];
           _place_in_texture_data = _place_in_texture_data + 1;
           output.push(byte_1);
-          //         *place_in_gs_buf = byte_1;
-          //         place_in_gs_buf = place_in_gs_buf + 1;
         }
         cond_temp = int_3 === 0;
         int_3 = int_3 + -1;
@@ -260,7 +258,7 @@ export function decompress_texture(buffer: Uint8Array, offset: number) {
         cond_temp_uint_2 = uint_2 & 1;
         uint_2 = uint_2 >>> 1;
         if (cond_temp_uint_2 === 0) break;
-        byte_1 = buffer[offset + _place_in_texture_data]; //*_place_in_texture_data;
+        byte_1 = buffer[offset + _place_in_texture_data];
         _place_in_texture_data = _place_in_texture_data + 1;
         int_1 = (byte_1 >> 6) + 2;
         look_ahead_byte_pointer =
@@ -271,12 +269,9 @@ export function decompress_texture(buffer: Uint8Array, offset: number) {
           bytes_written = bytes_written + 1;
           int_1 = int_1 + -1;
           output.push(byte_1);
-          //         *place_in_gs_buf = byte_1;
-          //         place_in_gs_buf = place_in_gs_buf + 1;
         }
       }
-      cond_temp_uint_2 = buffer[offset + _place_in_texture_data] >>> 4; // (ui*_place_in_texture_data >> 4);
-      // CONCAT11(*_place_in_texture_data,_place_in_texture_data[1]) | 0xfffff000;
+      cond_temp_uint_2 = buffer[offset + _place_in_texture_data] >>> 4;
       uint_1 =
         (((buffer[offset + _place_in_texture_data + 1] +
           buffer[offset + _place_in_texture_data] * 0x100) |
@@ -289,32 +284,27 @@ export function decompress_texture(buffer: Uint8Array, offset: number) {
       look_ahead_byte_pointer = (bytes_written + uint_1 - 1) % 0xffffffff;
       _place_in_texture_data = _place_in_texture_data + 2;
       while (int_1 !== 0) {
-        //       byte_1 = *look_ahead_byte_pointer;
         byte_1 = output[look_ahead_byte_pointer];
         look_ahead_byte_pointer = (look_ahead_byte_pointer + 1) % 0xffffffff;
         bytes_written = bytes_written + 1;
         int_1 = int_1 + -1;
         output.push(byte_1);
-        //       *place_in_gs_buf = byte_1;
-        //       place_in_gs_buf = place_in_gs_buf + 1;
       }
     }
     look_ahead_byte_pointer = _place_in_texture_data + 2;
     _place_in_texture_data = _place_in_texture_data + 3;
-    int_1 = (buffer[offset + look_ahead_byte_pointer] || 0) + 2; // *look_ahead_byte_pointer + 2;
+    int_1 = (buffer[offset + look_ahead_byte_pointer] || 0) + 2;
     if (buffer[offset + look_ahead_byte_pointer] === 0) break;
     look_ahead_byte_pointer = (bytes_written + uint_1 - 1) % 0xffffffff;
     while (int_1 !== 0) {
-      byte_1 = output[look_ahead_byte_pointer] || 0; //*look_ahead_byte_pointer;
+      byte_1 = output[look_ahead_byte_pointer] || 0;
       look_ahead_byte_pointer = look_ahead_byte_pointer + 1;
       bytes_written = bytes_written + 1;
       int_1 = int_1 + -1;
       output.push(byte_1);
-      //     *place_in_gs_buf = byte_1;
-      //     place_in_gs_buf = place_in_gs_buf + 1;
     }
   }
-  // return bytes_written;
+
   return {
     bytes_read: _place_in_texture_data,
     data: new Uint8Array(output),

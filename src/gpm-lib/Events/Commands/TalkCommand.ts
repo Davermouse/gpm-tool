@@ -10,8 +10,8 @@ export class TalkCommand extends BaseCommand {
     new ParamInfo(ParamType.Unknown),
   ];
 
-  constructor(offset: number, public params: number[]) {
-    super(offset);
+  constructor(offset: number, params: number[]) {
+    super(offset, 15, params);
   }
 
   public getTextureId() {

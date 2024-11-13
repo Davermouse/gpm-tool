@@ -8,7 +8,7 @@ export class EvString extends BaseCommand {
   public paramInfo: ParamInfo[] = [];
 
   constructor(offset: number, private data: Uint8Array) {
-    super(offset);
+    super(offset, 0, []);
 
     let t = "";
     for (let i = 0; i < data.length; i++) {
