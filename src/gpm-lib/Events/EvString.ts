@@ -1,6 +1,6 @@
 import { BaseCommand } from "./BaseCommand";
 import { ParamInfo } from "./ParamInfo";
-const shiftjis = require("shiftjis");
+import shiftjis from 'shiftjis';
 
 // Mode \4 is single width
 export class EvString extends BaseCommand {
