@@ -1,4 +1,5 @@
-import { cmd_to_string } from "../evdata";
+import { makeAutoObservable, makeObservable, observable } from "mobx";
+import { cmd_to_string, string_to_cmd } from "../evdata";
 import { overwrite_short, read_short, write_short } from "../helpers";
 import { BaseCommand } from "./BaseCommand";
 import { cmd_param_lengths } from "./CmdParamLengths";
@@ -12,7 +13,14 @@ export class GPEvent {
   public labels: { label: number; dest: number }[] = [];
   public post_label_data: number[] = [];
 
-  constructor(private data: Uint8Array) {
+  constructor(data: Uint8Array) {
+    makeObservable(this,
+      {
+        commands: observable,
+        labels: observable,
+      }
+    );
+
     this.populateCommands(data);
   }
 
@@ -21,11 +29,15 @@ export class GPEvent {
 
     for (const command of this.commands) {
       if (command instanceof EvString) {
-        lines.push(`Text: ${command.text}`);
+        lines.push(`Text:${command.text}`);
       } else {
         const label = command.label != null ? `${command.label}: ` : '';
 
         const cmdInfo = cmd_to_string(command.cmd);
+
+        if (!cmdInfo) {
+          throw new Error(`Unable to find command with ID ${command.cmd}`);
+        }
 
         lines.push(label + cmdInfo.title + (command.params.length ? ' ' + command.params.join(',') : ''));
       }
@@ -35,18 +47,64 @@ export class GPEvent {
   }
 
   public import(script: string) {
+    const importedCommands: BaseCommand[] = [];
     const lines = script.split('\n').map(l => l.trim());
 
     for (const line of lines) {
-      let label = null
-      const labelMatch = /\d+\:/.exec(line);
+      if (line.startsWith(`Text:`)) {
+        const text = line.replace('Text:', '');
+        importedCommands.push(new EvString(text));
+      } else {
+        let strippedLine = line;
+        let label = null;
+        const labelMatch = /(\d+):/.exec(line);
+  
+        if (labelMatch !== null && labelMatch.length) {
+          label = parseInt(labelMatch[1]);
 
-      if (labelMatch !== null && labelMatch.length) {
-        label = parseInt(labelMatch[0]);
+          strippedLine = strippedLine.replace(labelMatch[0], '');
+        }
+
+        let parts = strippedLine.split(/,|\s+/gm).map(p => p.trim()).filter(p => p.length);
+
+        if (parts.length === 0) {
+          console.error(`Unable to find command on line ${line}`);
+          throw new Error(`Unable to find command on line ${line}`);
+        }
+
+        const commandTitle = parts.shift() || '';
+
+        const command = string_to_cmd(commandTitle);
+
+        if (!command) {
+          console.error(`Unable to find command ${commandTitle} on line ${line}`);
+          throw new Error(`Unable to find command ${commandTitle} on line ${line}`);
+        }
+
+        if (command.params !== parts.length)  {
+          console.error(`Unexpected number of params on line ${line} expected ${command.params}`);
+          throw new Error(`Unexpected number of params on line ${line} expected ${command.params}`);
+        }
+
+        const params = parts.map(s => parseInt(s));
+
+        const c = buildCommand(command.commandId, params);
+
+        if (label) {
+          c.label = label;
+        }
+
+        importedCommands.push(c);
       }
-
-      
     }
+
+    this.commands = importedCommands;
+
+    this.labels = this.commands.filter(c => c.label !== null)
+      .map(c => ({
+        label: c.label || 0,
+        dest: 0, //TODO
+      }));
   }
 
   public serialize(): Uint8Array {
@@ -114,8 +172,6 @@ export class GPEvent {
     }
 
     while (curr < data.length) {
-      let cmd_offset = curr;
-
       if (data[curr] === COMMAND_START) {
         // This is a command)
         const cmd = data[curr + 1];
@@ -124,7 +180,7 @@ export class GPEvent {
           .fill(0)
           .map((_, i) => read_short(data, curr + 2 + i * 2));
 
-        const command = buildCommand(cmd_offset, cmd, params);
+        const command = buildCommand(cmd, params);
 
         const label = this.labels.find((l) => l.dest === curr + 2);
 
@@ -142,7 +198,7 @@ export class GPEvent {
         }
 
         this.commands.push(
-          new EvString(cmd_offset, new Uint8Array(stringBytes))
+          new EvString(new Uint8Array(stringBytes))
         );
         curr++;
       }

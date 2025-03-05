@@ -62,8 +62,8 @@ export class BinModule {
 
     const w = read_short(this.data, data_offset) * 2;
     const h = read_short(this.data, data_offset + 2);
-    const b = read_int(this.data, data_offset) >>> 0x10;
-    const c = read_int(this.data, data_offset) >>> 0x1e;
+  //  const b = read_int(this.data, data_offset) >>> 0x10;
+  //  const c = read_int(this.data, data_offset) >>> 0x1e;
 
     //  const mod_data = load_mod_data(a, b, c);
 

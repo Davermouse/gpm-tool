@@ -10,8 +10,8 @@ export class FaceOnCommand extends BaseCommand {
     new ParamInfo(ParamType.Unknown),
   ];
 
-  constructor(offset: number, public params: number[]) {
-    super(offset, 26, params);
+  constructor(public params: number[]) {
+    super(26, params);
   }
 
   public getTextureId() {

@@ -8,10 +8,12 @@ import { EvModule } from "../gpm-lib/EvFile";
 
 import styles from "./EventPreview.module.css";
 import { EvTexturePreview } from "./EVTexturePreview";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useCallback, useEffect, useState } from "react";
 import { FaceOnCommand } from "../gpm-lib/Events/Commands/FaceOnCommand";
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import classNames from "classnames";
+import { useDropzone } from "react-dropzone";
+import { useGPMToolContext } from "../context/GPMToolContext";
 
 const elementFromCommand = (index: number, command: BaseCommand) => {
   if (command instanceof EvString) {
@@ -33,7 +35,7 @@ const Label = ({ command }: { command: BaseCommand }) => {
       className={styles.label}
       id={command.label ? `label-${command.label}` : undefined}
     >
-      {command.label ? `${command.label.toString(16)}:` : ""}
+      <b>{command.label ? `${command.label.toString()}:` : ""}</b>
     </div>
   );
 };
@@ -136,7 +138,7 @@ const UnknownCommandEntry = ({
     <Accordion >
       <AccordionSummary>
         <Label command={unknownCommand} />
-        {cmdData.title}(
+        {cmdData !== null ? cmdData.title : `Unknown command ${unknownCommand.cmd}`}(
         {unknownCommand.params.map((p) => `0x${p.toString(16)}`).join(",")})
       </AccordionSummary>
       <AccordionDetails></AccordionDetails>
@@ -144,13 +146,41 @@ const UnknownCommandEntry = ({
   );
 };
 
-export const EventPreview = ({ module }: { module: EvModule }) => {
-  const event = new GPEvent(module.data);
+export const EventPreview = ({ eventId }: { eventId: number }) => {
+  const { gpmEventStore } = useGPMToolContext();
+  const event = gpmEventStore?.getEvent(eventId);
+
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    if (!acceptedFiles.length) {
+      console.warn('Attempted to import script but files empty');
+      return;
+    }
+
+    const f = acceptedFiles[0];
+    const buf = await f.text();
+
+    try {
+      if (event != null) {
+        event.import(buf);
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        alert(err.toString());
+      }
+    }
+    
+  }, []);
+
+  const { getRootProps, getInputProps } = useDropzone({ onDrop, accept: [".txt"]});
+
+  if (!event) {
+    return <div>Unable to find event.</div>;
+  }
 
   const serialize = () => {
     const d = event.serialize();
 
-    module.replaceData(d);
+    gpmEventStore?.saveEvent(eventId, event);
   };
 
   const doExport = () => {
@@ -176,9 +206,16 @@ export const EventPreview = ({ module }: { module: EvModule }) => {
     a.click();
   }
 
+  
   return (
     <div>
       <button onClick={() => doExport()}>Export script</button>
+
+      <div className={styles.uploadArea} { ...getRootProps()}>
+        <input {...getInputProps()} />
+        <p>Drop a script .txt file here</p>
+      </div>
+
       <div>
         <table>
           <thead>
@@ -190,7 +227,7 @@ export const EventPreview = ({ module }: { module: EvModule }) => {
           <tbody>
             {event.labels.map((l) => (
               <tr key={l.label.toString()}>
-                <td>{l.label.toString(16)}</td>
+                <td>{l.label.toString()}</td>
                 <td>
                   <a href={`#label-${l.label}`}>{l.dest}</a>
                 </td>

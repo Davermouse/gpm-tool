@@ -1,14 +1,15 @@
+import { BaseCommand } from "../BaseCommand";
 import { FaceOnCommand } from "./FaceOnCommand";
 import { TalkCommand } from "./TalkCommand";
 import { UnknownCommand } from "./UnknownCommand";
 
-export function buildCommand(offset: number, cmd: number, params: number[]) {
+export function buildCommand(cmd: number, params: number[]): BaseCommand {
   switch (cmd) {
     case 15:
-      return new TalkCommand(offset, params);
+      return new TalkCommand(params);
     case 26:
-      return new FaceOnCommand(offset, params);
+      return new FaceOnCommand(params);
     default:
-      return new UnknownCommand(offset, cmd, params);
+      return new UnknownCommand(cmd, params);
   }
 }

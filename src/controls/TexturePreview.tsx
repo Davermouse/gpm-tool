@@ -16,23 +16,6 @@ const greyClut = new Uint16Array(
   })
 );
 
-const textureDimensions = {
-  0xa00a: 0xe0,
-  0xa00b: 128,
-  0xa00d: 86,
-  0xa00f: 156,
-  0xa010: 160,
-  0xa013: 160,
-  0x900: 192,
-  0x901: 128,
-  0x7c16: 64,
-  0x7c17: 54,
-  0x7c25: 64,
-  0x7c26: 64,
-  0x7c2f: 50,
-  0x4b0c: 24,
-};
-
 export const TexturePreview = observer<
   React.FC<{
     texture: Texture;

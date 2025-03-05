@@ -1,4 +1,4 @@
-import { serialize_short, write_short } from "../../helpers";
+import { serialize_short } from "../../helpers";
 import { BaseCommand } from "../BaseCommand";
 import { COMMAND_START } from "../GPEvent";
 import { computeTextureId } from "../Helpers/CharacterHelpers";
@@ -10,8 +10,8 @@ export class TalkCommand extends BaseCommand {
     new ParamInfo(ParamType.Unknown),
   ];
 
-  constructor(offset: number, params: number[]) {
-    super(offset, 15, params);
+  constructor(params: number[]) {
+    super(15, params);
   }
 
   public getTextureId() {

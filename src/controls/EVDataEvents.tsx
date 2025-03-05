@@ -1,7 +1,7 @@
 import { observer } from "mobx-react";
 import { useState } from "react";
 import { useGPMToolContext } from "../context/GPMToolContext";
-import { EVFILE, EvModule, EvModuleType } from "../gpm-lib/EvFile";
+import { EVFILE, EvModuleType } from "../gpm-lib/EvFile";
 import { EventPreview } from "./EventPreview";
 import { EvTexturePreview } from "./EVTexturePreview";
 
@@ -31,7 +31,7 @@ export const EVDataEvents = observer(() => {
         <li>Click the 'Serialize' button at the top of the script.</li>
         <li>(When you've finished completely)</li>
         <li>Click the 'Save EV file' at the top of the page.</li>
-        <li>Go to the 'Publish' page to produce a gamae image.</li>
+        <li>Go to the 'Publish' page to produce a game image.</li>
         <li>Load in an emulator. PCSX-redux works well for me.</li>
       </ul>
       <label>Event ID:
@@ -44,11 +44,11 @@ export const EVDataEvents = observer(() => {
       <button onClick={() => fileStore.evFile && fileStore.iso?.replaceFile(EVFILE, Buffer.from(fileStore.evFile.data))}>
         Save EV file
       </button>
-      {module && module.type == EvModuleType.Texture && (
+      {module && module.type === EvModuleType.Texture && (
         <EvTexturePreview moduleId={currentOffset} />
       )}
-      {module && module.type == EvModuleType.Event && (
-        <EventPreview module={module} />
+      {module && module.type === EvModuleType.Event && (
+        <EventPreview eventId={currentOffset} />
       )}
 
       {!module && <span>Empty module</span>}

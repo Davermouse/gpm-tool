@@ -83,7 +83,7 @@ export class BufferReader {
     const hour = this.readByte();
     const min = this.readByte();
     const second = this.readByte();
-    const offset = this.readSignedByte();
+    /*const offset =*/ this.readSignedByte();
 
     return new Date(y, m, d, hour, min, second, 0);
   }
@@ -110,7 +110,7 @@ export class BufferReader {
     const min = this.readString(2);
     const second = this.readString(2);
     const hsecond = this.readString(2);
-    const off = this.readByte();
+    /*const off = */ this.readByte();
 
     return new Date(
       parseInt(y),

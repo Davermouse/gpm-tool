@@ -7,22 +7,28 @@ export class EvString extends BaseCommand {
   public text: string;
   public paramInfo: ParamInfo[] = [];
 
-  constructor(offset: number, private data: Uint8Array) {
-    super(offset, 0, []);
+  constructor(data: Uint8Array | string) {
+    super(0, []);
 
     let t = "";
-    for (let i = 0; i < data.length; i++) {
-      let b = data[i];
 
-      if (b < 10) {
-        t += "\\" + b.toString();
-      } else if (b < 0x75) {
-        t += shiftjis.decode([b]);
-      } else {
-        t += shiftjis.decode([b, data[i + 1]]);
+    if (data instanceof Uint8Array) {  
+      
+      for (let i = 0; i < data.length; i++) {
+        let b = data[i];
 
-        i++;
+        if (b < 10) {
+          t += "\\" + b.toString();
+        } else if (b < 0x75) {
+          t += shiftjis.decode([b]);
+        } else {
+          t += shiftjis.decode([b, data[i + 1]]);
+
+          i++;
+        }
       }
+    } else {
+      t = data;
     }
 
     this.text = t;

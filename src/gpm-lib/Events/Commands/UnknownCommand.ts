@@ -6,8 +6,8 @@ import { ParamInfo, ParamType } from "../ParamInfo";
 export class UnknownCommand extends BaseCommand {
   public paramInfo: ParamInfo[];
 
-  constructor(offset: number, cmd: number, params: number[]) {
-    super(offset, cmd, params);
+  constructor(cmd: number, params: number[]) {
+    super(cmd, params);
 
     this.paramInfo = params.map((_) => new ParamInfo(ParamType.Unknown));
   }
