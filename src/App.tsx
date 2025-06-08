@@ -13,6 +13,7 @@ import { Publish } from "./controls/Publish";
 import { Files } from "./controls/Files";
 import { Home } from "./pages/Home";
 import { Maps } from "./controls/Maps";
+import { Strings } from "./controls/Strings";
 
 const EvDataEventsPage = () => 
   <EVDataEvents />;
@@ -35,6 +36,9 @@ const PublishPage = () =>
 const HomePage = () => 
   <Home />;
 
+const StringsPage = () =>
+  <Strings />;
+
 const MenuItem = 
   ({ destination, text }: 
     { destination: string, text: string }
@@ -54,6 +58,9 @@ const LeftMenu = () => {
       <MenuItem
         destination="/events"
         text="Events" />
+      <MenuItem
+        destination="/strings"
+        text="Strings"/>
       <MenuItem
         destination="/maps"
         text="Maps" />
@@ -78,7 +85,7 @@ function App() {
 
   useEffect(() => {
     //  fileStore?.loadIso("/data/gpm01.iso");
-    // fileStore?.loadIso("/data/gunparademarch.bin");
+  //   fileStore?.loadIso("/.data/GPM-built.bin");
   });
 
   return (
@@ -96,6 +103,7 @@ function App() {
             <Routes>
               <Route path="/events" element={<EvDataEventsPage />} />
               <Route path="/maps" element={<MapsPage />} />
+              <Route path="/strings" element={<StringsPage />} />
               <Route path="/module_textures" element={<ModuleTexturesPage />} />
               <Route path="/characters" element={<CharactersPage />} />
               <Route path="/files" element={<FilesPage/>} />

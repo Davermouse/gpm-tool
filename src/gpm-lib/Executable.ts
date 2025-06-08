@@ -11,7 +11,7 @@ const MAP_DATA_LENGTH = 352 * 4;
 export class Executable {
     private data: Uint8Array;
 
-    constructor(private iso: GPMISO) {
+    constructor(iso: GPMISO) {
       this.data = iso.iso.getFile(EXECUTABLE_FILE);
     }
 

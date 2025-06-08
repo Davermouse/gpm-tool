@@ -3,8 +3,6 @@ import { BaseCommand } from "../gpm-lib/Events/BaseCommand";
 import { TalkCommand } from "../gpm-lib/Events/Commands/TalkCommand";
 import { UnknownCommand } from "../gpm-lib/Events/Commands/UnknownCommand";
 import { EvString } from "../gpm-lib/Events/EvString";
-import { GPEvent } from "../gpm-lib/Events/GPEvent";
-import { EvModule } from "../gpm-lib/EvFile";
 
 import styles from "./EventPreview.module.css";
 import { EvTexturePreview } from "./EVTexturePreview";

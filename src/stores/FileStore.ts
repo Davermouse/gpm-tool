@@ -4,11 +4,12 @@ import request from "superagent";
 import { BinModule, Texture } from "../gpm-lib/BinModule";
 
 import { EvFile } from "../gpm-lib/EvFile";
-import { GPMISO } from "../gpm-lib/GpmIso";
+import { GPMISO, OVERLAY_FILES } from "../gpm-lib/GpmIso";
 import { IsoFile } from "../gpm-lib/IsoReader";
 import { Executable } from "../gpm-lib/Executable";
 import { MapDataFile } from "../gpm-lib/MapData";
 import { FuurakiImage } from "../gpm-lib/FuurakiImage";
+import { RefrainLoveImage, RLEventEngine, RLOperator } from "../gpm-lib/refrainlove/RefrainLoveImage";
 
 class GPMFile {
   constructor(
@@ -21,9 +22,9 @@ class GPMFile {
 }
 
 export class FileStore {
-  public files: GPMFile[] = [];
+  public moduleFiles: GPMFile[] = [];
+  public overlayFiles: { [name:string]: Uint8Array } = {};
   public evFile: EvFile | null = null;
-  private rawIso: Buffer | null = null;
   public iso: IsoFile | null = null;
 
   public executable: Executable | null = null;
@@ -44,15 +45,13 @@ export class FileStore {
   }
 
   public async loadIsoData(buffer: Buffer) {
-    this.rawIso = buffer;
-
     const iso = new GPMISO(Buffer.from(buffer));
 
     runInAction(() => {
       console.log("Setting evFile");
 
       this.evFile = iso.evData;
-      this.files = iso.files.sort(
+      this.moduleFiles = iso.moduleFiles.sort(
         (a, b) => a.module.module_num - b.module.module_num
       );
     });
@@ -69,17 +68,41 @@ export class FileStore {
   
         this.iso = iso.iso;
         this.evFile = iso.evData;
-        this.files = iso.files.sort(
+        this.moduleFiles = iso.moduleFiles.sort(
           (a, b) => a.module.module_num - b.module.module_num
         );
   
         this.executable = new Executable(iso);
         this.mapData = new MapDataFile(iso, this.executable);
+
+            //  this.overlayFiles["CODE"] = iso.iso.getFile()
+        for (let overlayId in OVERLAY_FILES) {
+          const file = iso.iso.getFile(OVERLAY_FILES[overlayId]);
+
+          this.overlayFiles[overlayId] = file;
+        }
       });
     } else if (file.header?.volumeId === 'SLPS-03094') {
       console.info("Loading Fuuraki")
 
       const image = new FuurakiImage(file);
+    } else if (file.header?.header?.id === 'CD001') {
+      console.info('Loading Refrain Love Disc 1');
+
+      const image = new RefrainLoveImage(file);
+
+      const initEv = image.loadEvent("_BOOT");
+
+      if (initEv === null) {
+        console.error("Unable to find _BOOT event");
+        return;
+      }
+
+      console.info(`Init event length: ${initEv.steps.length}`);
+
+      const ee = new RLEventEngine(initEv);
+
+      ee.run();
     } else {
       console.info(file.header?.volumeId)
     }
@@ -95,7 +118,7 @@ export class FileStore {
   }
 
   public getModule(id: number): BinModule | undefined {
-    return this.files.find((f) => f.module && f.module.module_num === id)
+    return this.moduleFiles.find((f) => f.module && f.module.module_num === id)
       ?.module;
   }
 

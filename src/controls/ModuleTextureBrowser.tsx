@@ -14,7 +14,7 @@ export const ModuleTextureBrowser = observer(() => {
     return <>Filestore not found</>;
   }
 
-  const file = fileStore.files.find((f) => f.name === fileName);
+  const file = fileStore.moduleFiles.find((f) => f.name === fileName);
 
   let texture: Texture | null = null;
 
@@ -40,7 +40,7 @@ export const ModuleTextureBrowser = observer(() => {
     <div>
       <p>Browse textures loaded from game modules. These are identified by two bytes - the module id and then the index in that module. </p>
       <select value={fileName} onChange={(e) => setFileName(e.target.value)}>
-        {fileStore.files
+        {fileStore.moduleFiles
           .filter((f) => f.module)
           .sort((f) => f.module.module_num)
           .map((f) => (

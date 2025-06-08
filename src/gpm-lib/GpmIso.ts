@@ -11,6 +11,7 @@ export const MODULE_FILES = [
   "/OTHER/OPENING.BIN",
   "/OTHER/TURN.BIN",
   "/OTHER/TURNS.BIN",
+  "/OTHER/KIKI.BIN",
   "/DATA/TEXTURE.BIN",
   "/DATA/AROUND.BIN",
   "/FACE/FACES.BIN",
@@ -38,7 +39,19 @@ export const MODULE_FILES = [
   "/DATA/FZLIGHT.BIN",
   "/DATA/TIMEFONT.BIN",
   "/BATTLE/BTLSTAT.BIN",
+  "/OTHER/BTLINP.BIN",
+  "/OTHER/BTLTUTO.BIN",
+  "/OTHER/BTLOPEN.BIN",
+  "/OTHER/BTLEND.BIN",
+  "/BATTLE/BTLMAIN.BIN",
+  "/BATTLE/BTLEASY.BIN",
+  "/BATTLE/CMBFLD00.BIN",
+  "/BATTLE/BTLFACE.BIN",
 ];
+
+export const OVERLAY_FILES: { [id: string]: string } = {
+  "FINAMISC": "/MOD/FINAMISC.BIN"
+};
 
 class GPMFile {
   constructor(
@@ -51,7 +64,8 @@ class GPMFile {
 export class GPMISO {
   public iso: IsoFile;
   public evData: EvFile;
-  public files: GPMFile[] = [];
+  public moduleFiles: GPMFile[] = [];
+  public overlayFiles: { [name: string]: Uint8Array } = {};
 
   constructor(data: Buffer) {
     this.iso = new IsoFile(data);
@@ -67,7 +81,7 @@ export class GPMISO {
     for (let filename of MODULE_FILES) {
       const file = this.iso.getFile(filename);
 
-      this.files.push(
+      this.moduleFiles.push(
         new GPMFile(filename, file, new BinModule(filename, file))
       );
     }

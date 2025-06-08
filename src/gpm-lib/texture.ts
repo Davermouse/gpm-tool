@@ -311,6 +311,155 @@ export function decompress_texture(buffer: Uint8Array, offset: number) {
   };
 }
 
+export function compress_texture(data: Uint8Array): Uint8Array {
+  // Output buffer and position tracker
+  const output: number[] = [];
+  let output_pos = 0;
+  
+  // Bitstream management
+  let control_byte = 0;
+  let control_bit_count = 0;
+  let control_byte_pos = 0;
+  
+  // Function to write a control bit
+  function writeControlBit(bit: number) {
+    control_byte |= (bit << control_bit_count);
+    control_bit_count++;
+    
+    if (control_bit_count === 8) {
+      // Write the completed control byte
+      output[control_byte_pos] = control_byte;
+      
+      // Reset for next control byte
+      control_byte = 0;
+      control_bit_count = 0;
+      control_byte_pos = output_pos++;
+      output.push(0); // Reserve space for next control byte
+    }
+  }
+  
+  // Function to flush any remaining control bits
+  function flushControlBits() {
+    if (control_bit_count > 0) {
+      output[control_byte_pos] = control_byte;
+    }
+  }
+  
+  // LZ77 sliding window - find the longest match in previous data
+  function findLongestMatch(pos: number, max_length: number = 258, max_offset: number = 4096): { length: number, offset: number } | null {
+    if (pos === 0) return null;
+    
+    const max_search_pos = Math.max(0, pos - max_offset);
+    const search_bytes = Math.min(max_length, data.length - pos);
+    
+    if (search_bytes < 3) return null; // Minimum match length for efficiency
+    
+    let best_length = 0;
+    let best_offset = 0;
+    
+    // Search for matches
+    for (let i = pos - 1; i >= max_search_pos; i--) {
+      let match_length = 0;
+      
+      while (match_length < search_bytes && 
+             data[i + match_length] === data[pos + match_length]) {
+        match_length++;
+      }
+      
+      if (match_length > best_length) {
+        best_length = match_length;
+        best_offset = pos - i;
+        
+        // Early exit if we found a "perfect" match
+        if (best_length === search_bytes) break;
+      }
+    }
+    
+    // Only return matches that are worth encoding (at least 3 bytes)
+    if (best_length >= 3) {
+      return {
+        length: best_length,
+        offset: best_offset
+      };
+    }
+    
+    return null;
+  }
+  
+  // Reserve the first position for a control byte
+  control_byte_pos = output_pos++;
+  output.push(0);
+  
+  let pos = 0;
+  
+  while (pos < data.length) {
+    // Try to find a match
+    const match = findLongestMatch(pos);
+    
+    if (match === null) {
+      // No match, output literal byte
+      writeControlBit(1); // Signal a literal byte
+      output.push(data[pos]);
+      output_pos++;
+      pos++;
+    } else {
+      // We found a match, encode it based on length
+      if (match.length <= 9 && match.offset <= 63) {
+        // Short match encoding
+        writeControlBit(1); // First control bit
+        writeControlBit(0); // Second control bit pattern for match
+        
+        // Encode offset and length in a single byte
+        // Top 6 bits are low 6 bits of offset, bottom 2 bits are (length-2)
+        const encoded_byte = ((match.offset & 0x3F) << 2) | ((match.length - 2) & 0x3);
+        output.push(encoded_byte);
+        output_pos++;
+        
+      } else if (match.length <= 17) {
+        // Medium match encoding
+        writeControlBit(0);
+        
+        // Encode length in top 4 bits of first byte
+        const first_byte = (match.length - 2) << 4;
+        
+        // Encode offset in remaining 12 bits (across 2 bytes)
+        const second_byte = match.offset & 0xFF;
+        output.push(first_byte | ((match.offset >> 8) & 0x0F));
+        output.push(second_byte);
+        output_pos += 2;
+        
+      } else {
+        // Long match encoding
+        writeControlBit(0);
+        
+        // Signal a long match with 0 in the top 4 bits
+        output.push(0);
+        output.push(match.offset & 0xFF);
+        output.push((match.offset >> 8) & 0xFF);
+        
+        // Encode length-2 in the next byte
+        output.push(match.length - 2);
+        output_pos += 4;
+      }
+      
+      // Skip the matched bytes
+      pos += match.length;
+    }
+  }
+  
+  // Signal end of data with a special pattern
+  writeControlBit(0);
+  output.push(0);
+  output.push(0);
+  output.push(0);
+  output_pos += 3;
+  
+  // Flush any remaining control bits
+  flushControlBits();
+  
+  return new Uint8Array(output);
+}
+
 export function decompress_sized_texture(w: number, h: number, buffer: Uint8Array, offset: number): Uint8Array {
   const data_to_load = w * h * 2;
   const output = new Uint8Array(data_to_load);
