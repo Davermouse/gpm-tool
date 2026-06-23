@@ -30,6 +30,8 @@ export class FileStore {
   public executable: Executable | null = null;
   public mapData: MapDataFile | null = null;
 
+  public refrainLoveImage: RefrainLoveImage | null = null;
+
   constructor() {
     makeAutoObservable(this);
   }
@@ -89,20 +91,8 @@ export class FileStore {
     } else if (file.header?.header?.id === 'CD001') {
       console.info('Loading Refrain Love Disc 1');
 
-      const image = new RefrainLoveImage(file);
-
-      const initEv = image.loadEvent("_BOOT");
-
-      if (initEv === null) {
-        console.error("Unable to find _BOOT event");
-        return;
-      }
-
-      console.info(`Init event length: ${initEv.steps.length}`);
-
-      const ee = new RLEventEngine(initEv);
-
-      ee.run();
+      this.iso = file;
+      this.refrainLoveImage = new RefrainLoveImage(file);
     } else {
       console.info(file.header?.volumeId)
     }

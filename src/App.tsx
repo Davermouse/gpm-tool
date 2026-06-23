@@ -14,6 +14,7 @@ import { Files } from "./controls/Files";
 import { Home } from "./pages/Home";
 import { Maps } from "./controls/Maps";
 import { Strings } from "./controls/Strings";
+import { Debugger } from "./pages/refrainlove/Debugger";
 
 const EvDataEventsPage = () => 
   <EVDataEvents />;
@@ -55,6 +56,9 @@ const LeftMenu = () => {
       <MenuItem
         destination="/"
         text="Home" />
+      <MenuItem
+        destination="/refrainlove/debugger"
+        text="Debugger" />
       <MenuItem
         destination="/events"
         text="Events" />
@@ -101,6 +105,7 @@ function App() {
         <main>
           <div/>
             <Routes>
+              <Route path="/refrainlove/debugger" element={<Debugger/>} />
               <Route path="/events" element={<EvDataEventsPage />} />
               <Route path="/maps" element={<MapsPage />} />
               <Route path="/strings" element={<StringsPage />} />

@@ -1,3 +1,4 @@
+import { makeAutoObservable, makeObservable } from "mobx";
 import { IsoFile } from "../IsoReader";
 import shiftjis from 'shiftjis';
 
@@ -56,7 +57,21 @@ export class RLOperator {
 
 const nop = (_: RLEventEngine) => {
     console.info(`NOP`);
+    debugger;
 };
+
+const logic_or = (engine: RLEventEngine) => {
+    const a = engine.pop_and_map();
+    const b = engine.pop_and_map();
+
+    if (a || b) {
+        engine.push(0x4000001);
+    } else {
+        engine.push(0x4000000);
+    }
+
+    console.debug(`${print_hex(a)} || ${print_hex(b)}`);
+}
 
 const set = (engine: RLEventEngine) => {
     const val = engine.pop_and_map();
@@ -87,6 +102,32 @@ const cmd_shift_right = (engine: RLEventEngine) => {
     engine.push(result);
 }
 
+const eql = (engine: RLEventEngine) => {
+    const a = engine.pop_and_map();
+    const b = engine.pop_and_map();
+
+    if (a === b) {
+        engine.push(0x4000001);
+    } else {
+        engine.push(0x4000000);
+    }
+
+    console.debug(`${print_hex(a)} == ${print_hex(b)}`);
+}
+
+const neql = (engine: RLEventEngine) => {
+    const a = engine.pop_and_map();
+    const b = engine.pop_and_map();
+
+    if (a !== b) {
+        engine.push(0x4000001);
+    } else {
+        engine.push(0x4000000);
+    }
+
+    console.debug(`${print_hex(a)} != ${print_hex(b)}`);
+}
+
 const lt = (engine: RLEventEngine) => {
     const a = engine.pop_and_map();
     const b = engine.pop_and_map();
@@ -97,7 +138,7 @@ const lt = (engine: RLEventEngine) => {
         engine.push(0x4000000);
     }
 
-    console.debug(`${print_hex(b)} < ${print_hex(b)}`);
+    console.debug(`${print_hex(a)} < ${print_hex(b)}`);
 }
 
 const gt = (engine: RLEventEngine) => {
@@ -110,7 +151,25 @@ const gt = (engine: RLEventEngine) => {
         engine.push(0x4000000);
     }
 
-    console.debug(`${print_hex(b)} > ${print_hex(b)}`);
+    console.debug(`${print_hex(a)} > ${print_hex(b)}`);
+}
+
+const add = (engine: RLEventEngine) => {
+    const a = engine.pop_and_map();
+    const b = engine.pop_and_map();
+
+    engine.push(0x4000000 | (a + b));
+    
+    console.debug(`${print_hex(a)} + ${print_hex(b)}`);
+}
+
+const bit_and = (engine: RLEventEngine) => {
+    const a = engine.pop_and_map();
+    const b = engine.pop_and_map();
+
+    engine.push(0x4000000 | (a & b & 0xffff));
+    
+    console.debug(`${print_hex(a)} & ${print_hex(b)}`);
 }
 
 const je = (engine: RLEventEngine) => {
@@ -118,7 +177,7 @@ const je = (engine: RLEventEngine) => {
     const val = engine.pop_and_map();
 
     if (val === 0) {
-        engine.pc = dest & 0xffff - 1;
+        engine.pc = (dest - 1) & 0xffff;
     }
 
     console.debug(`JZ: ${print_hex(val)} => ${print_hex(dest & 0xffff)}`);
@@ -129,7 +188,7 @@ const jn = (engine: RLEventEngine) => {
     const val = engine.pop_and_map();
 
     if (val !== 0) {
-        engine.pc = dest & 0xffff - 1;
+        engine.pc = (dest - 1) & 0xffff ;
     }
 
     console.debug(`JN: ${print_hex(val)} => ${print_hex(dest & 0xffff)}`);
@@ -138,9 +197,28 @@ const jn = (engine: RLEventEngine) => {
 const jp = (engine: RLEventEngine) => {
     const dest = engine.pop_and_map();
 
-    engine.pc = dest & 0xffff - 1;
+    engine.pc = (dest - 1) & 0xffff;
 
     console.debug(`JP: ${print_hex(dest & 0xffff)}`);
+}
+
+const jsr = (engine: RLEventEngine) => {
+    const dest = engine.pop_and_map();
+
+    console.debug(`JSR: ${print_hex(dest & 0xffff)}`);
+
+    engine.push(engine.pc);
+    engine.push(engine.stack_min);
+    engine.stack_min = engine.stack_p;
+    engine.pc = (dest & 0xffff) - 1
+}
+
+const ret = (engine: RLEventEngine) => {
+    engine.stack_p = engine.stack_min;
+    engine.stack_min = engine.pop();
+    engine.pc = engine.pop();
+
+    console.debug(`RET: ${engine.pc}`);
 }
 
 const call = (engine: RLEventEngine) => {
@@ -182,10 +260,10 @@ const offset = (engine: RLEventEngine) => {
 
 const RLOperators = [
  //   new RLOperator("unk", nop),
-    new RLOperator("||", nop), // 0
+    new RLOperator("||", logic_or), // 0
     new RLOperator("&&", nop), // 1
-    new RLOperator("==", nop), // 2
-    new RLOperator("!=", nop), // 3
+    new RLOperator("==", eql), // 2
+    new RLOperator("!=", neql), // 3
     new RLOperator(">=", nop), // 4
     new RLOperator("<=", nop), // 5
     new RLOperator("<<", nop), // 6
@@ -193,12 +271,12 @@ const RLOperators = [
     new RLOperator("=", set), // 8
     new RLOperator("|", nop), // 9
     new RLOperator("^", nop), // a
-    new RLOperator("&", nop), // b
+    new RLOperator("&", bit_and), // b
     new RLOperator(">", gt), // c
     new RLOperator("<", lt), // d
     new RLOperator("/", nop), // e
     new RLOperator("*", nop), // f
-    new RLOperator("+", nop), // 10
+    new RLOperator("+", add), // 10
     new RLOperator("-", nop), // 11
     new RLOperator("!", nop), // 12
     new RLOperator("%", nop), // 13
@@ -206,14 +284,53 @@ const RLOperators = [
     new RLOperator("JE", je), // 15
     new RLOperator("JN", jn), // 16
     new RLOperator("JP", jp), // 17
-    new RLOperator("JSR", nop), // 18
-    new RLOperator("RET", nop), // 19
+    new RLOperator("JSR", jsr), // 18
+    new RLOperator("RET", ret), // 19
     new RLOperator("CALL", call), // 1a
     new RLOperator("OFFSET", offset), // 1b
     new RLOperator("NOP", nop),
     new RLOperator("NOP", nop),
     new RLOperator("NOP", nop),
 ];
+
+const select = (engine: RLEventEngine) => {
+    let param_count = engine.pop_and_map();
+
+    let options: number[] = [];
+    for (let i = 0 ; i < param_count ; i++) {
+        options[i] = engine.pop_and_map();
+    }
+
+    const select_id = options[1];
+
+    switch(select_id) {
+        case 0x5:
+            console.info('Start/load select');
+            engine.push_const(1);
+            break;
+        default:
+            console.error(`Unknown select: ${select_id.toString(16)}`);
+            engine.push_const(0);
+            break;
+    }
+};
+
+const bgm = (engine: RLEventEngine) => {
+    let param_count = engine.pop_and_map();
+
+    let bgm_name = [];
+
+    if (param_count !== 0) {
+        for (let i = 0 ; i < param_count ; i++) {
+            bgm_name[i] = engine.pop_and_map();
+        }
+    }
+
+    console.log(`BGM: ${bgm_name.map(n => String.fromCharCode(n)).join('')}`);
+
+  //  console.log(`Increasing stack_p by ${2 + param_count}`);
+  //  engine.stack_p += 2 + param_count;
+}
 
 const clear_parameters = (engine: RLEventEngine) => {
     let param_count = engine.pop_and_map();
@@ -259,8 +376,7 @@ const bg2 = (engine: RLEventEngine) => {
 
     console.debug(`BG2 ${option.toString(16)}`);
 
-
-    engine.push(0);
+   // engine.push(0);
 }
 
 const get_stats_sram = (engine: RLEventEngine) => {
@@ -274,7 +390,7 @@ const get_stats_sram = (engine: RLEventEngine) => {
         param_count--;
     }
 
-    engine.push(0);
+    engine.push(0x4000000);
 }
 
 const name_entry = (engine: RLEventEngine) => {
@@ -289,8 +405,38 @@ const show = (engine: RLEventEngine) => {
     console.debug(`SHOW`);
 }
 
-const clear_global_data = (engine: RLEventEngine) => {
+const movie = (engine: RLEventEngine) => {
+    console.debug('MOVIE');
+
+    let param_count = engine.pop_and_map();
+    const movie_id = engine.pop_and_map();
+
+    while (param_count > 1) {
+        engine.pop();
+        param_count--;
+    }
+
+    console.debug(`Movie ID: ${movie_id}`);
+}
+
+const msg_close = (engine: RLEventEngine) => {
+    console.debug('MSG_CLOSE');
+
     clear_parameters(engine);
+}
+
+const clear_global_data = (engine: RLEventEngine) => {
+    let param_count = engine.pop_and_map();
+
+    /* This seems wrong?
+    while (param_count) {
+        engine.pop();
+        param_count--;
+    }
+*/
+    for (let i = 0 ; i < engine.globals.length ; i++) {
+        engine.globals[i] = 0;
+    }
 
     console.debug(`CLEAR_GLOBAL_DATA`);
 }
@@ -318,17 +464,17 @@ const disc_stop = (engine: RLEventEngine) => {
 const RLCommands = [
     new RLOperator("MSGOPEN", nop), // 0
     new RLOperator("PRINTF", nop),  // 1
-    new RLOperator("SELECT", nop),  // 2
+    new RLOperator("SELECT", select),  // 2
     new RLOperator("BG", nop),      // 3
     new RLOperator("SE", nop),      // 4
-    new RLOperator("BGM", nop),     // 5
+    new RLOperator("BGM", bgm),     // 5
     new RLOperator("STILL", nop),   // 6
     new RLOperator("PERSON", nop),  // 7
     new RLOperator("EFFECT", effect), // 8
     new RLOperator("EVENT", effect), // 9
     new RLOperator("DISPMODE", disp_mode), // a
     new RLOperator("NAMEENTRY", name_entry), // b
-    new RLOperator("HIIROKAN", nop), // c
+    new RLOperator("HIROKAN", nop), // c
     new RLOperator("REVDIRECT", nop), // d
     new RLOperator("CHECK32BITFLAG", nop), // e
     new RLOperator("CHECKPERSONFLAG", nop), // f
@@ -341,7 +487,7 @@ const RLCommands = [
     new RLOperator("CHECK_DATA_FLAG_0", nop), // 16
     new RLOperator("CHECK_DATA_FLAG_1", nop), // 17
     new RLOperator("CHECK_DATA_FLAG_2", nop), // 18
-    new RLOperator("MOVIE", nop), // 19
+    new RLOperator("MOVIE", movie), // 19
     new RLOperator("ANIMATION", nop), // 1a
     new RLOperator("PAD", nop), // 1b
     new RLOperator("BG2", bg2), // 1c
@@ -355,7 +501,7 @@ const RLCommands = [
     new RLOperator("PERSONDOUBLE", nop), // 24
     new RLOperator("GETSTATSSRAM", nop), // 25
     new RLOperator("GAMESPEED", nop), // 26
-    new RLOperator("MSGCLOSE", nop), // 27
+    new RLOperator("MSGCLOSE", msg_close), // 27
     new RLOperator("CLEARGLOBALDATA", clear_global_data), // 28
     new RLOperator("GETDISCID", get_disc_id), // 29
     new RLOperator("DISCSTOP", disc_stop),
@@ -366,9 +512,9 @@ const RLCommands = [
     new RLOperator("DISCINIT", nop),
 ]
 
-type EventStep = number | RLOperator;
+export type EventStep = number | RLOperator;
 
-class RLEvent {
+export class RLEvent {
     steps: EventStep[];
 
     dataOffset: number;
@@ -381,8 +527,10 @@ class RLEvent {
         }
 
         this.dataOffset = data.readInt32LE(4);
+        console.log(`Event data base: ${this.dataOffset}`);
 
-        for (let i = 8 ; i < data.length ; i += 4) {
+
+        for (let i = 24 ; i < data.length ; i += 4) {
             let step = data.readInt32LE(i);
 
             if (step === -1) {
@@ -400,14 +548,17 @@ class RLEvent {
 
 export class RLEventEngine {
     stack: number[] = new Array(0x4000);
-    stack_p: number = -1;
+    stack_p: number = 0;
+    stack_min: number = 0;
     globals: number[] = new Array(0x4000);
     pc: number = 0;
     global_sp: number = 0;
 
     is_show: boolean = false;
 
-    constructor(private e: RLEvent) {
+    constructor(public e: RLEvent) {
+        makeAutoObservable(this);
+
         for (let i = 0 ; i < this.stack.length ; i++) {
             this.stack[i] = 0;
         }
@@ -415,6 +566,25 @@ export class RLEventEngine {
         for (let i = 0 ; i < this.globals.length ; i++) {
             this.globals[i] = 0;
         }
+
+        this.push(0x8019A7C4);
+        this.push(0x8019A7C4);
+        this.push(0x8019A7C4);
+        this.push(0x8019A7C4);
+        this.push(0x8019A7C4);
+        this.push(0);
+        this.push(0);
+        this.push(0);
+        this.push(0);
+
+        this.globals[0] = 0xe58e;
+        this.globals[1] = 0x6c90;
+        this.globals[2] = 0xf68c;
+        this.globals[3] = 0;
+        this.globals[4] = 0xe58e;
+        this.globals[5] = 0x6c90;
+        this.globals[6] = 0xf68c;
+        this.globals[7] = 0;
     }
 
     run() {
@@ -427,7 +597,7 @@ export class RLEventEngine {
 
             steps++;
 
-            if (steps > 500)
+            if (steps > 2000)
                 break;
         }
 
@@ -455,15 +625,14 @@ export class RLEventEngine {
             throw new Error(`POP empty stack`);
         }
 
+        this.stack_p--;
         const i = this.stack[this.stack_p];
 
         if (i === undefined) {
             throw new Error(`Popped undefined`);
         }
 
-        console.debug(`POP: Stack[${this.stack_p}] = ${print_hex(i)}`);
-
-        this.stack_p--;;
+        console.debug(`POP: Stack[${this.stack_p + 1}] = ${print_hex(i)}`);
 
         return i || 0;
     }
@@ -509,7 +678,7 @@ export class RLEventEngine {
                 }
             } else {
                 const s = this.stack[i & 0xffff];
-                console.debug(`POP_MAP Stack idx: ${i & 0xffff} val: ${s ? s.toString(16) : 0}`);
+                console.debug(`POP_MAP Stack idx: ${(i & 0xffff).toString(16)} val: ${s ? s.toString(16) : 0}`);
 
                 if (s === undefined) {
                     throw new Error(`Attempted to map from unknown stack ${i & 0xffff} size ${this.stack.length}`);
@@ -540,9 +709,18 @@ export class RLEventEngine {
             throw new Error(`Attempt to push undefined`);
         }
 
-        this.stack_p++;
+        if (n === 0) {
+            console.error('Attempt to push 0');
+        }
+
         this.stack[this.stack_p] = n;
         console.debug(`STACK[${this.stack_p}] = ${print_hex(n)}`);
+
+        this.stack_p++;
+    }
+
+    push_const(n: number) {
+        this.push(0x4000000 | n);
     }
 }
 
