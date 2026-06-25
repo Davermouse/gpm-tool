@@ -11,6 +11,8 @@ import { EvTexturePreview } from "./EVTexturePreview";
 import { ReactNode, useCallback, useEffect, useState } from "react";
 import { FaceOnCommand } from "../gpm-lib/Events/Commands/FaceOnCommand";
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
+
+import { observer } from "mobx-react";
 import classNames from "classnames";
 import { useDropzone } from "react-dropzone";
 import { useGPMToolContext } from "../context/GPMToolContext";
@@ -68,7 +70,7 @@ const CommandEntryDetails = ({ children }: { children: ReactNode}) =>
     {children}
   </div>;
 
-const StringEntry = ({ evString }: { evString: EvString }) => {
+const StringEntry = observer(({ evString }: { evString: EvString }) => {
   const [text, setText] = useState(evString.text);
 
   useEffect(() => {
@@ -81,12 +83,15 @@ const StringEntry = ({ evString }: { evString: EvString }) => {
         {evString.text}
       </CommandEntrySummary>
       <CommandEntryDetails>
-        <input value={text} onChange={(e) => setText(e.currentTarget.value)} />
-        <button onClick={() => (evString.text = text)}>Save</button>
+        <input value={text} onClick={(e) => e.stopPropagation()} onChange={(e) => setText(e.currentTarget.value)} />
+        <button onClick={(e) => {
+          evString.text = text;
+          console.log(`Setting text to ${text}`);
+        }}>Save</button>
       </CommandEntryDetails>
     </CommandEntry>
   );
-};
+});
 
 const TalkCommandEntry = ({ talkCommand }: { talkCommand: TalkCommand }) => {
   const currentPlayer = talkCommand.params[0] === 0 && talkCommand.params[1] === 0;
@@ -97,7 +102,7 @@ const TalkCommandEntry = ({ talkCommand }: { talkCommand: TalkCommand }) => {
         <Label command={talkCommand} />
         Talk(
         {talkCommand.paramInfo
-          .map((p, i) => `0x${talkCommand.params[i].toString(16)}`)
+          .map((_, i) => `0x${talkCommand.params[i].toString(16)}`)
           .join(",")}
         )
       </AccordionSummary>
@@ -178,8 +183,6 @@ export const EventPreview = ({ eventId }: { eventId: number }) => {
   }
 
   const serialize = () => {
-    const d = event.serialize();
-
     gpmEventStore?.saveEvent(eventId, event);
   };
 
@@ -206,7 +209,6 @@ export const EventPreview = ({ eventId }: { eventId: number }) => {
     a.click();
   }
 
-  
   return (
     <div>
       <button onClick={() => doExport()}>Export script</button>

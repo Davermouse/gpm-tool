@@ -1,5 +1,7 @@
 import { observer } from "mobx-react";
 import { useState } from "react";
+import { Buffer } from "buffer";
+
 import { useGPMToolContext } from "../context/GPMToolContext";
 import { EVFILE, EvModuleType } from "../gpm-lib/EvFile";
 import { EventPreview } from "./EventPreview";

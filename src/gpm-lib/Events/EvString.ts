@@ -1,3 +1,4 @@
+import { makeObservable, observable } from "mobx";
 import { BaseCommand } from "./BaseCommand";
 import { ParamInfo } from "./ParamInfo";
 import shiftjis from 'shiftjis';
@@ -32,6 +33,11 @@ export class EvString extends BaseCommand {
     }
 
     this.text = t;
+
+    makeObservable(this,
+    {
+      text: observable,
+    })
   }
 
   public serialize(): number[] {
