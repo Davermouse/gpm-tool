@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "https://davermouse.github.io/gpm-tool/",
   "dependencies": {
+    "@alexaltea/capstone-js": "^5.0.9",
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^6.4.7",
     "@mui/material": "^6.4.7",

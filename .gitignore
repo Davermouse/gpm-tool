@@ -12,6 +12,8 @@
 /build
 /dist
 
+/logs
+
 # misc
 .DS_Store
 .env.local
